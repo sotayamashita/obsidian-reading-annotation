@@ -76,6 +76,16 @@
 	color: var(--color-black);
 }
 
+.reading-annotation-badge-important {
+	background: var(--color-red);
+	color: var(--color-white);
+}
+
+.reading-annotation-badge-note {
+	background: var(--background-modifier-border);
+	color: var(--text-normal);
+}
+
 .reading-annotation-quote {
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);

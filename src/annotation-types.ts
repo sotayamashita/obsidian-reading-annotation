@@ -11,4 +11,6 @@ export const ANNOTATION_TYPES: readonly AnnotationType[] = [
 	{ id: "resonance", label: "共感", icon: "heart" },
 	{ id: "question", label: "疑問", icon: "help-circle" },
 	{ id: "caution", label: "注意", icon: "alert-triangle" },
+	{ id: "important", label: "重要", icon: "star" },
+	{ id: "note", label: "メモ", icon: "pencil" },
 ] as const;
