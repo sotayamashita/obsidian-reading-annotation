@@ -1,11 +1,9 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
+	"id": "obsidian-reading-annotation",
+	"name": "Reading Annotation",
+	"version": "0.1.0",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "Annotate text while reading with four reaction types (surprise, resonance, question, caution). Saves structured annotation files that coding agents can parse.",
+	"author": "Sam Yamashita",
 	"isDesktopOnly": false
 }
