@@ -54,36 +54,31 @@
 	border-radius: var(--radius-s);
 	margin-bottom: var(--size-4-2);
 	font-weight: var(--font-semibold);
+	color: #fff;
 }
 
 .reading-annotation-badge-surprise {
-	background: var(--color-yellow);
-	color: var(--color-black);
+	background: #b8860b;
 }
 
 .reading-annotation-badge-resonance {
-	background: var(--color-pink);
-	color: var(--color-black);
+	background: #c2185b;
 }
 
 .reading-annotation-badge-question {
-	background: var(--color-blue);
-	color: var(--color-white);
+	background: #1565c0;
 }
 
 .reading-annotation-badge-caution {
-	background: var(--color-orange);
-	color: var(--color-black);
+	background: #e65100;
 }
 
 .reading-annotation-badge-important {
-	background: var(--color-red);
-	color: var(--color-white);
+	background: #b71c1c;
 }
 
 .reading-annotation-badge-note {
-	background: var(--background-modifier-border);
-	color: var(--text-normal);
+	background: #455a64;
 }
 
 .reading-annotation-quote {
