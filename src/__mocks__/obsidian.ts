@@ -85,6 +85,13 @@ export class Editor {
 	}
 }
 
+export class Menu {
+	addItem(_cb: unknown): this {
+		return this;
+	}
+	showAtMouseEvent(_e: unknown): void {}
+}
+
 export function setIcon(_el: unknown, _icon: string): void {}
 
 export function debounce<T extends (...args: unknown[]) => unknown>(

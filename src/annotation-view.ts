@@ -1,6 +1,7 @@
-import { debounce, ItemView, setIcon, TFile } from "obsidian";
+import { debounce, ItemView, Menu, setIcon, TFile } from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
+import { replaceAnnotationType } from "annotation-updater";
 import { BLOCK_ID_PATTERN, getAnnotationPath } from "annotation-writer";
 
 export const VIEW_TYPE_ANNOTATION = "reading-annotation-view";
@@ -172,10 +173,33 @@ export class AnnotationView extends ItemView {
 
 			const cardHeader = card.createDiv({ cls: "reading-annotation-card-header" });
 
-			cardHeader.createEl("span", {
+			const badge = cardHeader.createEl("span", {
 				text: entry.typeLabel,
-				cls: `reading-annotation-badge reading-annotation-badge-${entry.type}`,
+				cls: `reading-annotation-badge reading-annotation-badge-${entry.type} clickable-icon`,
 			});
+
+			if (entry.blockId && annotationFile instanceof TFile) {
+				badge.addEventListener("click", (e) => {
+					const menu = new Menu();
+					for (const t of ANNOTATION_TYPES) {
+						if (t.id === entry.type) continue;
+						menu.addItem((item) => {
+							item.setTitle(t.label)
+								.setIcon(t.icon)
+								.onClick(async () => {
+									const content = await this.app.vault.read(annotationFile);
+									const updated = replaceAnnotationType(
+										content,
+										entry.blockId,
+										t.id,
+									);
+									await this.app.vault.modify(annotationFile, updated);
+								});
+						});
+					}
+					menu.showAtMouseEvent(e);
+				});
+			}
 
 			if (entry.blockId) {
 				const linkBtn = cardHeader.createEl("button", {

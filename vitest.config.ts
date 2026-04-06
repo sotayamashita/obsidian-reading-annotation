@@ -9,6 +9,7 @@ export default defineConfig({
 			"annotation-modal": resolve(__dirname, "src/annotation-modal.ts"),
 			"annotation-view": resolve(__dirname, "src/annotation-view.ts"),
 			"annotation-header": resolve(__dirname, "src/annotation-header.ts"),
+			"annotation-updater": resolve(__dirname, "src/annotation-updater.ts"),
 			obsidian: resolve(__dirname, "src/__mocks__/obsidian.ts"),
 		},
 	},
