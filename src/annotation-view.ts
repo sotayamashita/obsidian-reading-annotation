@@ -178,7 +178,7 @@ export class AnnotationView extends ItemView {
 				cls: `reading-annotation-badge reading-annotation-badge-${entry.type} clickable-icon`,
 			});
 
-			if (entry.blockId && annotationFile instanceof TFile) {
+			if (entry.blockId) {
 				badge.addEventListener("click", (e) => {
 					const menu = new Menu();
 					for (const t of ANNOTATION_TYPES) {
@@ -186,14 +186,10 @@ export class AnnotationView extends ItemView {
 						menu.addItem((item) => {
 							item.setTitle(t.label)
 								.setIcon(t.icon)
-								.onClick(async () => {
-									const content = await this.app.vault.read(annotationFile);
-									const updated = replaceAnnotationType(
-										content,
-										entry.blockId,
-										t.id,
+								.onClick(() => {
+									void this.app.vault.process(annotationFile, (data) =>
+										replaceAnnotationType(data, entry.blockId, t.id),
 									);
-									await this.app.vault.modify(annotationFile, updated);
 								});
 						});
 					}
