@@ -15,11 +15,14 @@ function createMockContainer() {
 			children.push({ tag: "div", cls: opts?.cls, listeners: {} });
 			return div;
 		},
-		createEl(tag: string, opts?: { cls?: string; attr?: Record<string, string> }) {
+		createEl(
+			tag: string,
+			opts?: { text?: string; cls?: string; attr?: Record<string, string> },
+		) {
 			const el = {
 				tag,
 				cls: opts?.cls,
-				text: undefined as string | undefined,
+				text: opts?.text as string | undefined,
 				listeners: {} as Record<string, (() => void)[]>,
 				addEventListener(event: string, handler: () => void) {
 					if (!el.listeners[event]) el.listeners[event] = [];
