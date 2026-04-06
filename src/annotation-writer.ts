@@ -1,6 +1,16 @@
 import { TFile, type Vault } from "obsidian";
 import { ANNOTATION_DIR, type AnnotationType } from "annotation-types";
 
+export function generateBlockId(text: string): string {
+	let hash = 0;
+	for (let i = 0; i < text.length; i++) {
+		const char = text.charCodeAt(i);
+		hash = (hash << 5) - hash + char;
+		hash |= 0;
+	}
+	return `ann-${Math.abs(hash).toString(36)}`;
+}
+
 export function getAnnotationPath(sourcePath: string): string {
 	const fileName = sourcePath.split("/").pop() ?? sourcePath;
 	return `${ANNOTATION_DIR}/${fileName}`;
@@ -18,7 +28,11 @@ export function formatEntry(
 	annotationType: AnnotationType,
 	comment: string,
 ): string {
-	const quoted = toBlockquote(selectedText);
+	const blockId = generateBlockId(selectedText);
+	const lines = selectedText.split("\n").map((line) => `> ${line}`);
+	lines[lines.length - 1] += ` ^${blockId}`;
+	const quoted = lines.join("\n");
+
 	const calloutHeader = `> [!${annotationType.id}]`;
 	const calloutBody = comment.trim() === "" ? ">" : toBlockquote(comment);
 

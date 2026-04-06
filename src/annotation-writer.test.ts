@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { getAnnotationPath, toBlockquote, formatEntry, formatFrontmatter } from "annotation-writer";
+import {
+	getAnnotationPath,
+	toBlockquote,
+	formatEntry,
+	formatFrontmatter,
+	generateBlockId,
+} from "annotation-writer";
 
 describe("getAnnotationPath", () => {
 	it("extracts filename and places in 42-annotation/", () => {
@@ -32,24 +38,43 @@ describe("toBlockquote", () => {
 describe("formatEntry", () => {
 	const surprise = { id: "surprise", label: "驚き", icon: "lightbulb" };
 
-	it("formats quote and comment", () => {
+	it("formats quote with block ID and comment", () => {
 		const result = formatEntry("selected text", surprise, "my comment");
-		expect(result).toBe("> selected text\n\n> [!surprise]\n> my comment");
+		const blockId = generateBlockId("selected text");
+		expect(result).toContain(`> selected text ^${blockId}`);
+		expect(result).toContain("> [!surprise]\n> my comment");
 	});
 
-	it("handles empty comment", () => {
+	it("handles empty comment with block ID", () => {
 		const result = formatEntry("selected text", surprise, "");
-		expect(result).toBe("> selected text\n\n> [!surprise]\n>");
+		const blockId = generateBlockId("selected text");
+		expect(result).toContain(`^${blockId}`);
+		expect(result).toContain("> [!surprise]\n>");
 	});
 
-	it("handles whitespace-only comment", () => {
-		const result = formatEntry("selected text", surprise, "   ");
-		expect(result).toBe("> selected text\n\n> [!surprise]\n>");
+	it("handles multiline quote with block ID on last line", () => {
+		const result = formatEntry("line1\nline2", surprise, "comment");
+		const blockId = generateBlockId("line1\nline2");
+		expect(result).toContain(`> line2 ^${blockId}`);
+	});
+});
+
+describe("generateBlockId", () => {
+	it("returns a deterministic ID for the same text", () => {
+		const id1 = generateBlockId("hello world");
+		const id2 = generateBlockId("hello world");
+		expect(id1).toBe(id2);
 	});
 
-	it("handles multiline quote and comment", () => {
-		const result = formatEntry("line1\nline2", surprise, "comment1\ncomment2");
-		expect(result).toBe("> line1\n> line2\n\n> [!surprise]\n> comment1\n> comment2");
+	it("returns different IDs for different text", () => {
+		const id1 = generateBlockId("hello world");
+		const id2 = generateBlockId("goodbye world");
+		expect(id1).not.toBe(id2);
+	});
+
+	it("returns an ID starting with 'ann-'", () => {
+		const id = generateBlockId("test");
+		expect(id).toMatch(/^ann-[a-z0-9]+$/);
 	});
 });
 

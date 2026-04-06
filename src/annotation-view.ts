@@ -1,4 +1,4 @@
-import { debounce, ItemView, TFile } from "obsidian";
+import { debounce, ItemView, setIcon, TFile } from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { getAnnotationPath } from "annotation-writer";
@@ -10,6 +10,7 @@ export interface AnnotationEntry {
 	type: string;
 	typeLabel: string;
 	comment: string;
+	blockId: string;
 }
 
 export function parseBlockquoteLine(line: string): string | null {
@@ -30,6 +31,7 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 		const lines = block.trim().split("\n");
 		const quoteLines: string[] = [];
 		let type = "";
+		let blockId = "";
 		const commentLines: string[] = [];
 		let inCallout = false;
 
@@ -46,7 +48,13 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 				if (inCallout) {
 					commentLines.push(parsed);
 				} else {
-					quoteLines.push(parsed);
+					const blockIdMatch = parsed.match(/\s\^(ann-[a-z0-9]+)$/);
+					if (blockIdMatch) {
+						blockId = blockIdMatch[1]!;
+						quoteLines.push(parsed.replace(/\s\^ann-[a-z0-9]+$/, ""));
+					} else {
+						quoteLines.push(parsed);
+					}
 				}
 			}
 		}
@@ -57,6 +65,7 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 			type,
 			typeLabel: typeInfo?.label ?? type,
 			comment: commentLines.join("\n").trim(),
+			blockId,
 		});
 	}
 
@@ -160,10 +169,23 @@ export class AnnotationView extends ItemView {
 		for (const entry of entries) {
 			const card = list.createDiv({ cls: "reading-annotation-card" });
 
-			card.createEl("span", {
+			const cardHeader = card.createDiv({ cls: "reading-annotation-card-header" });
+
+			cardHeader.createEl("span", {
 				text: entry.typeLabel,
 				cls: `reading-annotation-badge reading-annotation-badge-${entry.type}`,
 			});
+
+			if (entry.blockId) {
+				const linkBtn = cardHeader.createEl("button", {
+					cls: "reading-annotation-card-link clickable-icon",
+					attr: { "aria-label": "Open in annotation file" },
+				});
+				setIcon(linkBtn, "external-link");
+				linkBtn.addEventListener("click", () => {
+					void this.app.workspace.openLinkText(`${annotationPath}#^${entry.blockId}`, "");
+				});
+			}
 
 			const quoteEl = card.createEl("blockquote", {
 				cls: "reading-annotation-quote",

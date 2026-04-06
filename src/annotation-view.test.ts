@@ -87,6 +87,30 @@ describe("parseAnnotationFile", () => {
 		expect(entries[0]!.comment).toBe("");
 	});
 
+	it("extracts blockID from quote with block reference", () => {
+		const content = [
+			"---",
+			'source: "[[40-raw/Article]]"',
+			"date: 2026-04-06",
+			"type: reading-annotation",
+			"---",
+			"",
+			"> Some quoted text ^ann-abc123",
+			"",
+			"> [!surprise]",
+			"> My comment",
+		].join("\n");
+		const entries = parseAnnotationFile(content);
+		expect(entries).toHaveLength(1);
+		expect(entries[0]!.blockId).toBe("ann-abc123");
+		expect(entries[0]!.quote).toBe("Some quoted text");
+	});
+
+	it("returns empty blockId when no block reference exists", () => {
+		const entries = parseAnnotationFile(sampleContent);
+		expect(entries[0]!.blockId).toBe("");
+	});
+
 	it("returns empty array for content without frontmatter", () => {
 		expect(parseAnnotationFile("no frontmatter here")).toEqual([]);
 	});

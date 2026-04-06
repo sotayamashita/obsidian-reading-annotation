@@ -36,6 +36,17 @@
 	background: var(--background-secondary);
 }
 
+.reading-annotation-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.reading-annotation-card-link {
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
 .reading-annotation-badge {
 	display: inline-block;
 	font-size: var(--font-ui-smaller);
