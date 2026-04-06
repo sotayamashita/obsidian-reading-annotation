@@ -1,4 +1,5 @@
 import { ItemView, TFile } from "obsidian";
+import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { getAnnotationPath } from "annotation-writer";
 
@@ -145,8 +146,8 @@ export class AnnotationView extends ItemView {
 		const header = container.createDiv({
 			cls: "reading-annotation-header",
 		});
-		header.createEl("h4", {
-			text: `Annotations (${entries.length})`,
+		renderHeader(header, entries.length, () => {
+			void this.app.workspace.openLinkText(annotationPath, "");
 		});
 
 		const list = container.createDiv({ cls: "reading-annotation-list" });

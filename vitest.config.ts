@@ -8,6 +8,7 @@ export default defineConfig({
 			"annotation-writer": resolve(__dirname, "src/annotation-writer.ts"),
 			"annotation-modal": resolve(__dirname, "src/annotation-modal.ts"),
 			"annotation-view": resolve(__dirname, "src/annotation-view.ts"),
+			"annotation-header": resolve(__dirname, "src/annotation-header.ts"),
 			obsidian: resolve(__dirname, "src/__mocks__/obsidian.ts"),
 		},
 	},
