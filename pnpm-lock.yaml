@@ -12,6 +12,12 @@ importers:
         specifier: latest
         version: 1.12.3(@codemirror/state@6.5.0)(@codemirror/view@6.38.6)
     devDependencies:
+      '@codemirror/state':
+        specifier: 6.5.0
+        version: 6.5.0
+      '@codemirror/view':
+        specifier: 6.38.6
+        version: 6.38.6
       '@commitlint/cli':
         specifier: ^20.5.0
         version: 20.5.0(@types/node@16.18.126)(conventional-commits-parser@6.4.0)(typescript@5.9.3)

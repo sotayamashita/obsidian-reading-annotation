@@ -1,18 +1,61 @@
+import { type EditorView } from "@codemirror/view";
 import {
 	Editor,
 	type MarkdownFileInfo,
 	MarkdownView,
 	Notice,
 	Plugin,
+	TFile,
 	WorkspaceLeaf,
 } from "obsidian";
 import { AnnotationModal } from "annotation-modal";
 import { AnnotationView, VIEW_TYPE_ANNOTATION } from "annotation-view";
-import { writeAnnotation } from "annotation-writer";
+import { getAnnotationPath, writeAnnotation } from "annotation-writer";
+import { createHighlightExtension, dispatchRefreshHighlights } from "highlight-editor";
+import { highlightPostProcessor } from "highlight-reading";
+import { createHighlightStore } from "highlight-store";
+
+function getEditorView(editor: Editor): EditorView | null {
+	return (editor as unknown as { cm?: EditorView }).cm ?? null;
+}
 
 export default class ReadingAnnotationPlugin extends Plugin {
 	override async onload(): Promise<void> {
 		this.registerView(VIEW_TYPE_ANNOTATION, (leaf) => new AnnotationView(leaf));
+
+		const store = createHighlightStore(this.app.vault);
+		this.registerMarkdownPostProcessor(highlightPostProcessor(store));
+		this.registerEditorExtension(createHighlightExtension(store));
+
+		let lastRefreshedPath: string | null = null;
+
+		this.registerEvent(
+			this.app.vault.on("modify", (file) => {
+				if (!(file instanceof TFile)) return;
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile) return;
+				const expectedPath = getAnnotationPath(activeFile.path);
+				if (file.path !== expectedPath) return;
+
+				void store.refreshForPath(activeFile.path).then(() => {
+					this.app.workspace.iterateAllLeaves((leaf) => {
+						if (!(leaf.view instanceof MarkdownView)) return;
+						if (leaf.view.file?.path !== activeFile.path) return;
+						const cmView = getEditorView(leaf.view.editor);
+						if (cmView) dispatchRefreshHighlights(cmView);
+					});
+				});
+			}),
+		);
+
+		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", () => {
+				const activeFile = this.app.workspace.getActiveFile();
+				if (!activeFile || activeFile.path === lastRefreshedPath) return;
+				lastRefreshedPath = activeFile.path;
+				void store.refreshForPath(activeFile.path);
+			}),
+		);
 
 		this.addCommand({
 			id: "open-annotation-panel",
