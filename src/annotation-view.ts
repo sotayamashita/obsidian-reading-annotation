@@ -1,4 +1,4 @@
-import { ItemView, TFile } from "obsidian";
+import { debounce, ItemView, TFile } from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { getAnnotationPath } from "annotation-writer";
@@ -63,8 +63,13 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 	return entries;
 }
 
+const DEBOUNCE_MS = 300;
+
 export class AnnotationView extends ItemView {
 	private lastFilePath: string | null = null;
+	private readonly debouncedRefresh = debounce(() => {
+		void this.refresh();
+	}, DEBOUNCE_MS);
 
 	override getViewType(): string {
 		return VIEW_TYPE_ANNOTATION;
@@ -95,7 +100,7 @@ export class AnnotationView extends ItemView {
 				if (!activeFile) return;
 				const expectedPath = getAnnotationPath(activeFile.path);
 				if (file.path === expectedPath) {
-					void this.refresh();
+					this.debouncedRefresh();
 				}
 			}),
 		);

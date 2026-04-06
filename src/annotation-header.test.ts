@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { renderHeader } from "annotation-header";
+import { renderHeader, type HeaderContainer } from "annotation-header";
 
 function createMockContainer() {
 	const children: {
@@ -22,7 +22,7 @@ function createMockContainer() {
 			const el = {
 				tag,
 				cls: opts?.cls,
-				text: opts?.text as string | undefined,
+				text: opts?.text,
 				listeners: {} as Record<string, (() => void)[]>,
 				addEventListener(event: string, handler: () => void) {
 					if (!el.listeners[event]) el.listeners[event] = [];
@@ -40,7 +40,7 @@ describe("renderHeader", () => {
 		const container = createMockContainer();
 		const onOpenFile = vi.fn();
 
-		renderHeader(container, 3, onOpenFile);
+		renderHeader(container as unknown as HeaderContainer, 3, onOpenFile);
 
 		const h4 = container.children.find((c) => c.tag === "h4");
 		expect(h4).toBeDefined();
@@ -55,7 +55,7 @@ describe("renderHeader", () => {
 		const container = createMockContainer();
 		const onOpenFile = vi.fn();
 
-		renderHeader(container, 2, onOpenFile);
+		renderHeader(container as unknown as HeaderContainer, 2, onOpenFile);
 
 		const button = container.children.find((c) => c.tag === "button");
 		expect(button).toBeDefined();

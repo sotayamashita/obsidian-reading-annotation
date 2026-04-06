@@ -48,8 +48,10 @@ export async function writeAnnotation(
 		return;
 	}
 
-	if (!vault.getAbstractFileByPath(ANNOTATION_DIR)) {
+	try {
 		await vault.createFolder(ANNOTATION_DIR);
+	} catch {
+		// folder already exists
 	}
 
 	const content = `${formatFrontmatter(sourcePath)}\n\n${entry}`;

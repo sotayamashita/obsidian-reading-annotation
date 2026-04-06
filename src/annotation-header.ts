@@ -1,9 +1,5 @@
 import { setIcon } from "obsidian";
 
-export interface HeaderEl {
-	addEventListener(event: string, handler: () => void): void;
-}
-
 export interface HeaderContainer {
 	createEl(
 		tag: string,
@@ -12,7 +8,7 @@ export interface HeaderContainer {
 			cls?: string;
 			attr?: Record<string, string>;
 		},
-	): HeaderEl;
+	): HTMLElement;
 }
 
 export function renderHeader(
@@ -29,6 +25,6 @@ export function renderHeader(
 		cls: "reading-annotation-open-file clickable-icon",
 		attr: { "aria-label": "Open annotation file" },
 	});
-	setIcon(btn as unknown as HTMLElement, "external-link");
+	setIcon(btn, "external-link");
 	btn.addEventListener("click", onOpenFile);
 }
