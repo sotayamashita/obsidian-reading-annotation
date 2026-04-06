@@ -5,6 +5,9 @@
 }
 
 .reading-annotation-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	padding: var(--size-4-2) var(--size-4-4);
 	border-bottom: 1px solid var(--background-modifier-border);
 }
@@ -15,6 +18,11 @@
 	color: var(--text-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
+}
+
+.reading-annotation-open-file {
+	color: var(--text-muted);
+	cursor: pointer;
 }
 
 .reading-annotation-list {

@@ -84,3 +84,5 @@ export class Editor {
 		return "";
 	}
 }
+
+export function setIcon(_el: unknown, _icon: string): void {}
