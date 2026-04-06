@@ -1,6 +1,6 @@
 import type { MarkdownPostProcessorContext } from "obsidian";
-import type { AnnotationEntry } from "annotation-view";
 import type { HighlightStore } from "highlight-store";
+import { ANNOTATION_DIR } from "annotation-types";
 import { mapNormalizedRange, normalizeWhitespace } from "text-match";
 
 interface TextSegment {
@@ -68,6 +68,8 @@ export function highlightPostProcessor(
 	store: HighlightStore,
 ): (el: HTMLElement, ctx: MarkdownPostProcessorContext) => void {
 	return (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+		if (ctx.sourcePath.startsWith(ANNOTATION_DIR + "/")) return;
+
 		const entries = store.getAnnotations(ctx.sourcePath);
 		if (entries.length === 0) return;
 

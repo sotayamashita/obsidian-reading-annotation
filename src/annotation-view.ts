@@ -1,4 +1,4 @@
-import { debounce, ItemView, Menu, setIcon, TFile } from "obsidian";
+import { debounce, ItemView, MarkdownRenderer, Menu, setIcon, TFile } from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { replaceAnnotationType } from "annotation-updater";
@@ -216,10 +216,16 @@ export class AnnotationView extends ItemView {
 			);
 
 			if (entry.comment) {
-				card.createEl("p", {
-					text: entry.comment,
+				const commentEl = card.createDiv({
 					cls: "reading-annotation-comment",
 				});
+				void MarkdownRenderer.render(
+					this.app,
+					entry.comment,
+					commentEl,
+					annotationPath,
+					this,
+				);
 			}
 		}
 	}
