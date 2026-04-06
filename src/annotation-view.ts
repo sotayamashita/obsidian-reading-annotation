@@ -1,7 +1,7 @@
 import { debounce, ItemView, setIcon, TFile } from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
-import { getAnnotationPath } from "annotation-writer";
+import { BLOCK_ID_PATTERN, getAnnotationPath } from "annotation-writer";
 
 export const VIEW_TYPE_ANNOTATION = "reading-annotation-view";
 
@@ -48,10 +48,10 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 				if (inCallout) {
 					commentLines.push(parsed);
 				} else {
-					const blockIdMatch = parsed.match(/\s\^(ann-[a-z0-9]+)$/);
+					const blockIdMatch = parsed.match(BLOCK_ID_PATTERN);
 					if (blockIdMatch) {
 						blockId = blockIdMatch[1]!;
-						quoteLines.push(parsed.replace(/\s\^ann-[a-z0-9]+$/, ""));
+						quoteLines.push(parsed.replace(BLOCK_ID_PATTERN, ""));
 					} else {
 						quoteLines.push(parsed);
 					}
@@ -117,6 +117,7 @@ export class AnnotationView extends ItemView {
 	}
 
 	override async onClose(): Promise<void> {
+		this.debouncedRefresh.cancel();
 		this.contentEl.empty();
 	}
 

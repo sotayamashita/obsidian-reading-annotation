@@ -87,6 +87,11 @@ export class Editor {
 
 export function setIcon(_el: unknown, _icon: string): void {}
 
-export function debounce<T extends (...args: unknown[]) => unknown>(fn: T, _delay: number): T {
-	return fn;
+export function debounce<T extends (...args: unknown[]) => unknown>(
+	fn: T,
+	_delay: number,
+): T & { cancel(): void } {
+	const wrapper = fn as T & { cancel(): void };
+	wrapper.cancel = () => {};
+	return wrapper;
 }

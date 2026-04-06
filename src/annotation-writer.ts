@@ -1,6 +1,9 @@
 import { TFile, type Vault } from "obsidian";
 import { ANNOTATION_DIR, type AnnotationType } from "annotation-types";
 
+export const BLOCK_ID_PREFIX = "ann-";
+export const BLOCK_ID_PATTERN = /\s\^(ann-[a-z0-9]+)$/;
+
 export function generateBlockId(text: string): string {
 	let hash = 0;
 	for (let i = 0; i < text.length; i++) {
@@ -8,7 +11,7 @@ export function generateBlockId(text: string): string {
 		hash = (hash << 5) - hash + char;
 		hash |= 0;
 	}
-	return `ann-${Math.abs(hash).toString(36)}`;
+	return `${BLOCK_ID_PREFIX}${Math.abs(hash).toString(36)}`;
 }
 
 export function getAnnotationPath(sourcePath: string): string {
@@ -29,14 +32,17 @@ export function formatEntry(
 	comment: string,
 ): string {
 	const blockId = generateBlockId(selectedText);
-	const lines = selectedText.split("\n").map((line) => `> ${line}`);
-	lines[lines.length - 1] += ` ^${blockId}`;
-	const quoted = lines.join("\n");
+	const quoted = toBlockquote(selectedText);
+	const lastNewline = quoted.lastIndexOf("\n");
+	const withBlockId =
+		lastNewline === -1
+			? `${quoted} ^${blockId}`
+			: `${quoted.slice(0, lastNewline)}\n${quoted.slice(lastNewline + 1)} ^${blockId}`;
 
 	const calloutHeader = `> [!${annotationType.id}]`;
 	const calloutBody = comment.trim() === "" ? ">" : toBlockquote(comment);
 
-	return `${quoted}\n\n${calloutHeader}\n${calloutBody}`;
+	return `${withBlockId}\n\n${calloutHeader}\n${calloutBody}`;
 }
 
 export function formatFrontmatter(sourcePath: string): string {
