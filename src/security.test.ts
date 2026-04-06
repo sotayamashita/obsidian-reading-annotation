@@ -16,7 +16,6 @@ const SOURCE_FILES = [
 	"src/annotation-writer.ts",
 	"src/annotation-view.ts",
 	"src/annotation-header.ts",
-	"src/annotation-shortcut.ts",
 ];
 
 const DANGEROUS_PATTERNS = [

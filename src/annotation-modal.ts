@@ -1,5 +1,4 @@
 import { App, Modal, Setting } from "obsidian";
-import { resolveTypeByKey } from "annotation-shortcut";
 import { ANNOTATION_TYPES, type AnnotationType } from "annotation-types";
 
 const PREVIEW_MAX_LENGTH = 200;
@@ -34,9 +33,6 @@ export class AnnotationModal extends Modal {
 		});
 		previewEl.createEl("blockquote", { text: preview });
 
-		let dropdownEl: HTMLSelectElement | null = null;
-		let textareaEl: HTMLTextAreaElement | null = null;
-
 		new Setting(contentEl).setName("Type").addDropdown((dropdown) => {
 			for (const t of ANNOTATION_TYPES) {
 				dropdown.addOption(t.id, t.label);
@@ -46,11 +42,9 @@ export class AnnotationModal extends Modal {
 				this.selectedType =
 					ANNOTATION_TYPES.find((t) => t.id === value) ?? ANNOTATION_TYPES[0]!;
 			});
-			dropdownEl = dropdown.selectEl;
 		});
 
 		new Setting(contentEl).setName("Comment").addTextArea((textarea) => {
-			textareaEl = textarea.inputEl;
 			textarea.inputEl.rows = 4;
 			textarea.inputEl.setCssStyles({ width: "100%" });
 			textarea.onChange((value) => {
@@ -72,19 +66,6 @@ export class AnnotationModal extends Modal {
 					this.submit();
 				}),
 		);
-
-		contentEl.addEventListener("keydown", (e: KeyboardEvent) => {
-			const isTextareaFocused = document.activeElement === textareaEl;
-			const resolved = resolveTypeByKey(e.key, isTextareaFocused);
-			if (resolved) {
-				e.preventDefault();
-				this.selectedType = resolved;
-				if (dropdownEl) {
-					dropdownEl.value = resolved.id;
-				}
-				textareaEl?.focus();
-			}
-		});
 	}
 
 	override onClose(): void {
