@@ -19,7 +19,7 @@ export class AnnotationModal extends Modal {
 		this.onSubmit = onSubmit;
 	}
 
-	onOpen(): void {
+	override onOpen(): void {
 		this.setTitle("Annotate");
 		const { contentEl } = this;
 
@@ -46,7 +46,7 @@ export class AnnotationModal extends Modal {
 
 		new Setting(contentEl).setName("Comment").addTextArea((textarea) => {
 			textarea.inputEl.rows = 4;
-			textarea.inputEl.style.width = "100%";
+			textarea.inputEl.setCssStyles({ width: "100%" });
 			textarea.onChange((value) => {
 				this.comment = value;
 			});
@@ -68,7 +68,7 @@ export class AnnotationModal extends Modal {
 		);
 	}
 
-	onClose(): void {
+	override onClose(): void {
 		this.contentEl.empty();
 	}
 

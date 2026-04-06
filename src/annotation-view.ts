@@ -1,4 +1,4 @@
-import { ItemView, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, TFile } from "obsidian";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { getAnnotationPath } from "annotation-writer";
 
@@ -65,25 +65,25 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 export class AnnotationView extends ItemView {
 	private lastFilePath: string | null = null;
 
-	getViewType(): string {
+	override getViewType(): string {
 		return VIEW_TYPE_ANNOTATION;
 	}
 
-	getDisplayText(): string {
+	override getDisplayText(): string {
 		return "Annotations";
 	}
 
-	getIcon(): string {
+	override getIcon(): string {
 		return "message-square";
 	}
 
-	async onOpen(): Promise<void> {
+	override async onOpen(): Promise<void> {
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", () => {
 				const activeFile = this.app.workspace.getActiveFile();
 				const newPath = activeFile?.path ?? null;
 				if (newPath !== this.lastFilePath) {
-					this.refresh();
+					void this.refresh();
 				}
 			}),
 		);
@@ -94,14 +94,14 @@ export class AnnotationView extends ItemView {
 				if (!activeFile) return;
 				const expectedPath = getAnnotationPath(activeFile.path);
 				if (file.path === expectedPath) {
-					this.refresh();
+					void this.refresh();
 				}
 			}),
 		);
-		this.refresh();
+		void this.refresh();
 	}
 
-	async onClose(): Promise<void> {
+	override async onClose(): Promise<void> {
 		this.contentEl.empty();
 	}
 

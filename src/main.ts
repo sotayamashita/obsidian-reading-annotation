@@ -1,17 +1,24 @@
-import { Editor, MarkdownFileInfo, MarkdownView, Notice, Plugin, WorkspaceLeaf } from "obsidian";
+import {
+	Editor,
+	type MarkdownFileInfo,
+	MarkdownView,
+	Notice,
+	Plugin,
+	WorkspaceLeaf,
+} from "obsidian";
 import { AnnotationModal } from "annotation-modal";
 import { AnnotationView, VIEW_TYPE_ANNOTATION } from "annotation-view";
 import { writeAnnotation } from "annotation-writer";
 
 export default class ReadingAnnotationPlugin extends Plugin {
-	async onload(): Promise<void> {
+	override async onload(): Promise<void> {
 		this.registerView(VIEW_TYPE_ANNOTATION, (leaf) => new AnnotationView(leaf));
 
 		this.addCommand({
 			id: "open-annotation-panel",
 			name: "Open annotation panel",
 			callback: () => {
-				this.activateView();
+				void this.activateView();
 			},
 		});
 
@@ -55,7 +62,7 @@ export default class ReadingAnnotationPlugin extends Plugin {
 			await leaf.setViewState({ type: VIEW_TYPE_ANNOTATION, active: true });
 		}
 
-		workspace.revealLeaf(leaf);
+		await workspace.revealLeaf(leaf);
 	}
 
 	private openAnnotationModal(editor: Editor, view: MarkdownView): void {
@@ -71,20 +78,15 @@ export default class ReadingAnnotationPlugin extends Plugin {
 			return;
 		}
 
-		const modal = new AnnotationModal(this.app, selection, async (annotationType, comment) => {
-			try {
-				await writeAnnotation(
-					this.app.vault,
-					file.path,
-					selection,
-					annotationType,
-					comment,
-				);
-				new Notice("Annotation saved");
-			} catch (e) {
-				console.error("Reading Annotation:", e);
-				new Notice("Failed to save annotation");
-			}
+		const modal = new AnnotationModal(this.app, selection, (annotationType, comment) => {
+			void writeAnnotation(this.app.vault, file.path, selection, annotationType, comment)
+				.then(() => {
+					new Notice("Annotation saved");
+				})
+				.catch((e: unknown) => {
+					console.error("Reading Annotation:", e);
+					new Notice("Failed to save annotation");
+				});
 		});
 		modal.open();
 	}
