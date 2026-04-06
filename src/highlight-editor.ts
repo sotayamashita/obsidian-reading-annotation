@@ -7,6 +7,7 @@ import {
 	ViewPlugin,
 } from "@codemirror/view";
 import { editorInfoField } from "obsidian";
+import { isAnnotationPath } from "annotation-types";
 import type { HighlightStore } from "highlight-store";
 import { mapNormalizedRange, normalizeWhitespace } from "text-match";
 
@@ -82,7 +83,7 @@ export function createHighlightExtension(store: HighlightStore): Extension {
 			buildDecorations(view: EditorView): DecorationSet {
 				const info = view.state.field(editorInfoField);
 				const filePath = info?.file?.path;
-				if (!filePath) return Decoration.none;
+				if (!filePath || isAnnotationPath(filePath)) return Decoration.none;
 
 				const entries = store.getAnnotations(filePath);
 				if (entries.length === 0) return Decoration.none;

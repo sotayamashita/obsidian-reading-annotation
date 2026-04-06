@@ -14,3 +14,7 @@ export const ANNOTATION_TYPES: readonly AnnotationType[] = [
 	{ id: "important", label: "重要", icon: "star" },
 	{ id: "note", label: "メモ", icon: "pencil" },
 ] as const;
+
+export function isAnnotationPath(path: string): boolean {
+	return path.startsWith(ANNOTATION_DIR + "/");
+}
