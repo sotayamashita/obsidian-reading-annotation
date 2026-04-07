@@ -42,14 +42,14 @@ describe("formatEntry", () => {
 		const result = formatEntry("selected text", surprise, "my comment");
 		const blockId = generateBlockId("selected text");
 		expect(result).toContain(`> selected text ^${blockId}`);
-		expect(result).toContain("> [!surprise]\n> my comment");
+		expect(result).toContain("> [!surprise] 驚き\n> my comment");
 	});
 
 	it("handles empty comment with block ID", () => {
 		const result = formatEntry("selected text", surprise, "");
 		const blockId = generateBlockId("selected text");
 		expect(result).toContain(`^${blockId}`);
-		expect(result).toContain("> [!surprise]\n>");
+		expect(result).toContain("> [!surprise] 驚き\n>");
 	});
 
 	it("handles multiline quote with block ID on last line", () => {

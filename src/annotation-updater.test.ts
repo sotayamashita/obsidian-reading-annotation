@@ -17,7 +17,7 @@ describe("replaceAnnotationType", () => {
 
 	it("replaces the callout type for a matching block ID", () => {
 		const result = replaceAnnotationType(sampleContent, "ann-abc123", "question");
-		expect(result).toContain("> [!question]");
+		expect(result).toContain("> [!question] 疑問");
 		expect(result).not.toContain("> [!surprise]");
 		expect(result).toContain("> Some quoted text ^ann-abc123");
 		expect(result).toContain("> My comment");
@@ -51,7 +51,7 @@ describe("replaceAnnotationType", () => {
 
 		const result = replaceAnnotationType(multiContent, "ann-second", "caution");
 		expect(result).toContain("> [!surprise]");
-		expect(result).toContain("> [!caution]");
+		expect(result).toContain("> [!caution] 注意");
 		expect(result).not.toContain("> [!resonance]");
 	});
 });

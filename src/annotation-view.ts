@@ -37,7 +37,7 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 		let inCallout = false;
 
 		for (const line of lines) {
-			const calloutMatch = line.match(/^>\s*\[!(\w+)\]\s*$/);
+			const calloutMatch = line.match(/^>\s*\[!(\w+)\].*$/);
 			if (calloutMatch) {
 				type = calloutMatch[1]!;
 				inCallout = true;

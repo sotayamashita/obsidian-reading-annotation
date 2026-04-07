@@ -3,7 +3,7 @@ import { ANNOTATION_DIR, type AnnotationType } from "annotation-types";
 
 export const BLOCK_ID_PREFIX = "ann-";
 export const BLOCK_ID_PATTERN = /\s\^(ann-[a-z0-9]+)$/;
-export const CALLOUT_HEADER_PATTERN = /^(>\s*)\[!(\w+)\]/m;
+export const CALLOUT_HEADER_PATTERN = /^(>\s*)\[!(\w+)\].*/m;
 
 export function generateBlockId(text: string): string {
 	let hash = 0;
@@ -40,7 +40,7 @@ export function formatEntry(
 			? `${quoted} ^${blockId}`
 			: `${quoted.slice(0, lastNewline)}\n${quoted.slice(lastNewline + 1)} ^${blockId}`;
 
-	const calloutHeader = `> [!${annotationType.id}]`;
+	const calloutHeader = `> [!${annotationType.id}] ${annotationType.label}`;
 	const calloutBody = comment.trim() === "" ? ">" : toBlockquote(comment);
 
 	return `${withBlockId}\n\n${calloutHeader}\n${calloutBody}`;
