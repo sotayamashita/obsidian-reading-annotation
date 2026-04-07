@@ -5,7 +5,7 @@ import { type AnnotationEntry, parseAnnotationFile } from "annotation-view";
 export interface HighlightStore {
 	getAnnotations(sourcePath: string): AnnotationEntry[];
 	refreshForPath(sourcePath: string): Promise<void>;
-	onDidChange(listener: () => void): () => void;
+	onDidChange(listener: (sourcePath: string) => void): () => void;
 }
 
 function entriesEqual(a: AnnotationEntry[], b: AnnotationEntry[]): boolean {
@@ -26,11 +26,11 @@ function entriesEqual(a: AnnotationEntry[], b: AnnotationEntry[]): boolean {
 
 export function createHighlightStore(vault: Vault): HighlightStore {
 	const cache = new Map<string, AnnotationEntry[]>();
-	const listeners = new Set<() => void>();
+	const listeners = new Set<(sourcePath: string) => void>();
 
-	function notify(): void {
+	function notify(sourcePath: string): void {
 		for (const listener of listeners) {
-			listener();
+			listener(sourcePath);
 		}
 	}
 
@@ -46,7 +46,7 @@ export function createHighlightStore(vault: Vault): HighlightStore {
 			if (!(file instanceof TFile)) {
 				const hadEntries = cache.has(sourcePath);
 				cache.delete(sourcePath);
-				if (hadEntries) notify();
+				if (hadEntries) notify(sourcePath);
 				return;
 			}
 
@@ -57,10 +57,10 @@ export function createHighlightStore(vault: Vault): HighlightStore {
 			if (previous && entriesEqual(previous, entries)) return;
 
 			cache.set(sourcePath, entries);
-			notify();
+			notify(sourcePath);
 		},
 
-		onDidChange(listener: () => void): () => void {
+		onDidChange(listener: (sourcePath: string) => void): () => void {
 			listeners.add(listener);
 			return () => {
 				listeners.delete(listener);

@@ -27,7 +27,19 @@ export default class ReadingAnnotationPlugin extends Plugin {
 		this.registerMarkdownPostProcessor(highlightPostProcessor(store));
 		this.registerEditorExtension(createHighlightExtension(store));
 
-		let lastRefreshedPath: string | null = null;
+		const dispatchToFile = (path: string): void => {
+			this.app.workspace.iterateAllLeaves((leaf) => {
+				if (!(leaf.view instanceof MarkdownView)) return;
+				if (leaf.view.file?.path !== path) return;
+				const cmView = getEditorView(leaf.view.editor);
+				if (cmView) dispatchRefreshHighlights(cmView);
+			});
+		};
+
+		const unsubscribe = store.onDidChange((sourcePath) => {
+			dispatchToFile(sourcePath);
+		});
+		this.register(unsubscribe);
 
 		this.registerEvent(
 			this.app.vault.on("modify", (file) => {
@@ -36,23 +48,14 @@ export default class ReadingAnnotationPlugin extends Plugin {
 				if (!activeFile) return;
 				const expectedPath = getAnnotationPath(activeFile.path);
 				if (file.path !== expectedPath) return;
-
-				void store.refreshForPath(activeFile.path).then(() => {
-					this.app.workspace.iterateAllLeaves((leaf) => {
-						if (!(leaf.view instanceof MarkdownView)) return;
-						if (leaf.view.file?.path !== activeFile.path) return;
-						const cmView = getEditorView(leaf.view.editor);
-						if (cmView) dispatchRefreshHighlights(cmView);
-					});
-				});
+				void store.refreshForPath(activeFile.path);
 			}),
 		);
 
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", () => {
 				const activeFile = this.app.workspace.getActiveFile();
-				if (!activeFile || activeFile.path === lastRefreshedPath) return;
-				lastRefreshedPath = activeFile.path;
+				if (!activeFile) return;
 				void store.refreshForPath(activeFile.path);
 			}),
 		);
