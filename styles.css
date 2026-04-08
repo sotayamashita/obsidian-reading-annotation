@@ -1,3 +1,20 @@
+/*
+ * Per-type tokens. Badge and highlight styles derive from these, so changing
+ * a tag's color only requires editing one line here.
+ */
+body {
+	--ra-color-surprise: var(--color-yellow);
+	--ra-color-surprise-rgb: var(--color-yellow-rgb);
+	--ra-color-resonance: var(--color-pink);
+	--ra-color-resonance-rgb: var(--color-pink-rgb);
+	--ra-color-question: var(--color-blue);
+	--ra-color-question-rgb: var(--color-blue-rgb);
+	--ra-color-caution: var(--color-orange);
+	--ra-color-caution-rgb: var(--color-orange-rgb);
+	--ra-color-important: var(--color-red);
+	--ra-color-important-rgb: var(--color-red-rgb);
+}
+
 .reading-annotation-empty {
 	color: var(--text-muted);
 	padding: var(--size-4-4);
@@ -54,31 +71,32 @@
 	border-radius: var(--radius-s);
 	margin-bottom: var(--size-4-2);
 	font-weight: var(--font-semibold);
-	color: #fff;
+	color: var(--text-on-accent);
 }
 
 .reading-annotation-badge-surprise {
-	background: #b8860b;
+	background: var(--ra-color-surprise);
 }
 
 .reading-annotation-badge-resonance {
-	background: #c2185b;
+	background: var(--ra-color-resonance);
 }
 
 .reading-annotation-badge-question {
-	background: #1565c0;
+	background: var(--ra-color-question);
 }
 
 .reading-annotation-badge-caution {
-	background: #e65100;
+	background: var(--ra-color-caution);
 }
 
 .reading-annotation-badge-important {
-	background: #b71c1c;
+	background: var(--ra-color-important);
 }
 
 .reading-annotation-badge-note {
-	background: #455a64;
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
 }
 
 .reading-annotation-quote {
@@ -102,33 +120,33 @@
 }
 
 .reading-annotation-hl-surprise {
-	background: rgba(184, 134, 11, 0.2);
-	border-bottom: 2px solid rgba(184, 134, 11, 0.6);
+	background: rgba(var(--ra-color-surprise-rgb), 0.2);
+	border-bottom: 2px solid rgba(var(--ra-color-surprise-rgb), 0.6);
 }
 
 .reading-annotation-hl-resonance {
-	background: rgba(194, 24, 91, 0.2);
-	border-bottom: 2px solid rgba(194, 24, 91, 0.6);
+	background: rgba(var(--ra-color-resonance-rgb), 0.2);
+	border-bottom: 2px solid rgba(var(--ra-color-resonance-rgb), 0.6);
 }
 
 .reading-annotation-hl-question {
-	background: rgba(21, 101, 192, 0.2);
-	border-bottom: 2px solid rgba(21, 101, 192, 0.6);
+	background: rgba(var(--ra-color-question-rgb), 0.2);
+	border-bottom: 2px solid rgba(var(--ra-color-question-rgb), 0.6);
 }
 
 .reading-annotation-hl-caution {
-	background: rgba(230, 81, 0, 0.2);
-	border-bottom: 2px solid rgba(230, 81, 0, 0.6);
+	background: rgba(var(--ra-color-caution-rgb), 0.2);
+	border-bottom: 2px solid rgba(var(--ra-color-caution-rgb), 0.6);
 }
 
 .reading-annotation-hl-important {
-	background: rgba(183, 28, 28, 0.2);
-	border-bottom: 2px solid rgba(183, 28, 28, 0.6);
+	background: rgba(var(--ra-color-important-rgb), 0.2);
+	border-bottom: 2px solid rgba(var(--ra-color-important-rgb), 0.6);
 }
 
 .reading-annotation-hl-note {
-	background: rgba(69, 90, 100, 0.2);
-	border-bottom: 2px solid rgba(69, 90, 100, 0.6);
+	background: var(--background-modifier-hover);
+	border-bottom: 2px solid var(--background-modifier-border);
 }
 
 .reading-annotation-preview blockquote {
