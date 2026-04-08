@@ -1,5 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { parseBlockquoteLine, parseAnnotationFile } from "annotation-view";
+import { parseBlockquoteLine, parseAnnotationFile, truncateQuote } from "annotation-view";
+
+describe("truncateQuote", () => {
+	it("returns the quote unchanged when under the limit", () => {
+		expect(truncateQuote("短い引用です。", 150)).toBe("短い引用です。");
+	});
+
+	it("cuts at the nearest Japanese sentence boundary before the limit", () => {
+		const q = "一文目です。二文目はここで終わる。三文目はもっと長い内容が続いていく文章です。";
+		const result = truncateQuote(q, 20);
+		expect(result).toBe("一文目です。二文目はここで終わる。…");
+	});
+
+	it("cuts at the nearest English sentence boundary before the limit", () => {
+		const q = "First sentence. Second sentence here. Third runs on and on and on.";
+		const result = truncateQuote(q, 40);
+		expect(result).toBe("First sentence. Second sentence here.…");
+	});
+
+	it("falls back to hard cut when no sentence boundary exists before the limit", () => {
+		const q = "a".repeat(200);
+		const result = truncateQuote(q, 50);
+		expect(result).toBe("a".repeat(50) + "…");
+	});
+
+	it("prefers the latest boundary that still fits", () => {
+		const q = "あ。い。う。え。お。か。き。く。け。こ。";
+		const result = truncateQuote(q, 10);
+		expect(result).toBe("あ。い。う。え。お。…");
+	});
+});
 
 describe("parseBlockquoteLine", () => {
 	it("extracts content after '> '", () => {

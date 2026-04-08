@@ -75,6 +75,30 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 
 const DEBOUNCE_MS = 300;
 
+const SENTENCE_BOUNDARIES = ["。", ". "];
+
+/**
+ * Truncate a quote at the latest sentence boundary that still fits within
+ * `limit` characters, so we don't chop mid-sentence. Falls back to a hard
+ * character cut when no boundary exists before the limit.
+ */
+export function truncateQuote(quote: string, limit: number): string {
+	if (quote.length <= limit) return quote;
+
+	let cut = -1;
+	for (const boundary of SENTENCE_BOUNDARIES) {
+		const window = quote.slice(0, limit + 1);
+		const idx = window.lastIndexOf(boundary);
+		if (idx >= 0) {
+			const end = idx + boundary.length;
+			if (end > cut) cut = end;
+		}
+	}
+
+	const sliced = cut > 0 ? quote.slice(0, cut) : quote.slice(0, limit);
+	return sliced.trimEnd() + "…";
+}
+
 export class AnnotationView extends ItemView {
 	private lastFilePath: string | null = null;
 	private readonly debouncedRefresh = debounce(() => {
@@ -213,9 +237,7 @@ export class AnnotationView extends ItemView {
 			const quoteEl = card.createEl("blockquote", {
 				cls: "reading-annotation-quote",
 			});
-			quoteEl.setText(
-				entry.quote.length > 150 ? entry.quote.slice(0, 150) + "..." : entry.quote,
-			);
+			quoteEl.setText(truncateQuote(entry.quote, 150));
 
 			if (entry.comment) {
 				const commentEl = card.createDiv({

@@ -118,9 +118,14 @@ body {
 	color: var(--text-muted);
 }
 
+/*
+ * Quote is someone else's words; comment is the reader's own thought.
+ * Keep the quote one step smaller and fainter than the comment so the
+ * reader's own voice reads as primary in a Zettelkasten workflow.
+ */
 .reading-annotation-quote {
-	font-size: var(--font-ui-small);
-	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
 	border-left: 2px solid var(--background-modifier-border);
 	padding-left: var(--size-4-3);
 	margin: var(--size-4-2) 0;
@@ -128,6 +133,7 @@ body {
 
 .reading-annotation-comment {
 	font-size: var(--font-ui-small);
+	color: var(--text-normal);
 	margin: var(--size-4-2) 0 0 0;
 }
 
