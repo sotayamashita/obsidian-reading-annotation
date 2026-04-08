@@ -169,7 +169,9 @@ export class AnnotationView extends ItemView {
 		const list = container.createDiv({ cls: "reading-annotation-list" });
 
 		for (const entry of entries) {
-			const card = list.createDiv({ cls: "reading-annotation-card" });
+			const card = list.createDiv({
+				cls: `reading-annotation-card reading-annotation-card-${entry.type}`,
+			});
 
 			const cardHeader = card.createDiv({ cls: "reading-annotation-card-header" });
 

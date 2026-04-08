@@ -50,7 +50,26 @@ body {
 	padding: var(--size-4-3);
 	margin-bottom: var(--size-4-2);
 	border-radius: var(--radius-s);
-	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+}
+
+/*
+ * High-priority tags tint the card background so the eye lands on them
+ * first when scanning a long list. The tint mirrors the in-editor highlight
+ * language (same color token, lower alpha) so the two panes read as one
+ * system. Low-priority tags (note, surprise, resonance) intentionally stay
+ * neutral to preserve the contrast.
+ */
+.reading-annotation-card-important {
+	background: rgba(var(--ra-color-important-rgb), 0.08);
+}
+
+.reading-annotation-card-caution {
+	background: rgba(var(--ra-color-caution-rgb), 0.08);
+}
+
+.reading-annotation-card-question {
+	background: rgba(var(--ra-color-question-rgb), 0.08);
 }
 
 .reading-annotation-card-header {
