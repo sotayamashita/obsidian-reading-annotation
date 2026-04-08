@@ -113,6 +113,7 @@ export function truncateQuote(quote: string, limit: number): string {
 
 export class AnnotationView extends ItemView {
 	private lastFilePath: string | null = null;
+	private pendingFlashBlockId: string | null = null;
 	private readonly debouncedRefresh = debounce(() => {
 		void this.refresh();
 	}, DEBOUNCE_MS);
@@ -205,9 +206,15 @@ export class AnnotationView extends ItemView {
 		const list = container.createDiv({ cls: "reading-annotation-list" });
 
 		for (const entry of entries) {
-			const card = list.createDiv({
-				cls: `reading-annotation-card reading-annotation-card-${entry.type}`,
-			});
+			const cardClasses = [
+				"reading-annotation-card",
+				`reading-annotation-card-${entry.type}`,
+			];
+			if (entry.blockId && entry.blockId === this.pendingFlashBlockId) {
+				cardClasses.push("reading-annotation-card-flash");
+				this.pendingFlashBlockId = null;
+			}
+			const card = list.createDiv({ cls: cardClasses.join(" ") });
 
 			const cardHeader = card.createDiv({ cls: "reading-annotation-card-header" });
 
@@ -232,6 +239,7 @@ export class AnnotationView extends ItemView {
 							item.setTitle(t.label)
 								.setIcon(t.icon)
 								.onClick(() => {
+									this.pendingFlashBlockId = entry.blockId;
 									void this.app.vault.process(annotationFile, (data) =>
 										replaceAnnotationType(data, entry.blockId, t.id),
 									);

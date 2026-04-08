@@ -72,6 +72,32 @@ body {
 	background: rgba(var(--ra-color-question-rgb), 0.08);
 }
 
+/*
+ * After the user reassigns an annotation type via the badge menu, the
+ * card is rebuilt by refresh(). Add a brief brightness flash so the
+ * write lands with visible feedback instead of a silent swap. Uses
+ * filter so it works on any card color (neutral or tinted) without
+ * clobbering the existing background token.
+ */
+@keyframes ra-card-flash {
+	0% {
+		filter: brightness(1.25);
+	}
+	100% {
+		filter: brightness(1);
+	}
+}
+
+.reading-annotation-card-flash {
+	animation: ra-card-flash 500ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reading-annotation-card-flash {
+		animation: none;
+	}
+}
+
 .reading-annotation-card-header {
 	display: flex;
 	align-items: center;
