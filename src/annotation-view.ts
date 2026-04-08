@@ -25,7 +25,7 @@ export function parseAnnotationFile(content: string): AnnotationEntry[] {
 	if (!bodyMatch) return [];
 	const body = bodyMatch[1]!;
 
-	const blocks = body.split(/\n---\n/).filter((b) => b.trim() !== "");
+	const blocks = body.split(/\n---\n/).filter((b) => /^>/m.test(b));
 	const entries: AnnotationEntry[] = [];
 
 	for (const block of blocks) {

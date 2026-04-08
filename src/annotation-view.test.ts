@@ -119,4 +119,60 @@ describe("parseAnnotationFile", () => {
 		const content = "---\nkey: value\n---\n";
 		expect(parseAnnotationFile(content)).toEqual([]);
 	});
+
+	it("skips blocks without any blockquote lines (e.g. claims section)", () => {
+		const content = [
+			"---",
+			'source: "[[40-raw/Article]]"',
+			"type: reading-annotation",
+			"---",
+			"",
+			"## 重要なポイント",
+			"",
+			"- 主張 1",
+			"- 主張 2",
+			"",
+			"---",
+			"",
+			"> Quoted text ^ann-abc123",
+			"",
+			"> [!note] メモ",
+			"> A comment",
+		].join("\n");
+		const entries = parseAnnotationFile(content);
+		expect(entries).toHaveLength(1);
+		expect(entries[0]!.blockId).toBe("ann-abc123");
+		expect(entries[0]!.quote).toBe("Quoted text");
+	});
+
+	it("skips claims section placed between entries", () => {
+		const content = [
+			"---",
+			'source: "[[40-raw/Article]]"',
+			"type: reading-annotation",
+			"---",
+			"",
+			"> First ^ann-aaa",
+			"",
+			"> [!note] メモ",
+			"> c1",
+			"",
+			"---",
+			"",
+			"## 補足",
+			"",
+			"plain prose here",
+			"",
+			"---",
+			"",
+			"> Second ^ann-bbb",
+			"",
+			"> [!question] 疑問",
+			"> c2",
+		].join("\n");
+		const entries = parseAnnotationFile(content);
+		expect(entries).toHaveLength(2);
+		expect(entries[0]!.blockId).toBe("ann-aaa");
+		expect(entries[1]!.blockId).toBe("ann-bbb");
+	});
 });
