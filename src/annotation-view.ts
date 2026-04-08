@@ -78,6 +78,18 @@ const DEBOUNCE_MS = 300;
 const SENTENCE_BOUNDARIES = ["。", ". "];
 
 /**
+ * Append a closing `**` when the input has an odd number of bold markers,
+ * so a truncation that lands mid-emphasis still renders as valid markdown.
+ * Single `*` is left alone because it collides with list markers and is
+ * harder to disambiguate; we only handle the common bold case.
+ */
+function closeDanglingBold(text: string): string {
+	const matches = text.match(/\*\*/g);
+	if (matches && matches.length % 2 === 1) return text + "**";
+	return text;
+}
+
+/**
  * Truncate a quote at the latest sentence boundary that still fits within
  * `limit` characters, so we don't chop mid-sentence. Falls back to a hard
  * character cut when no boundary exists before the limit.
@@ -96,7 +108,7 @@ export function truncateQuote(quote: string, limit: number): string {
 	}
 
 	const sliced = cut > 0 ? quote.slice(0, cut) : quote.slice(0, limit);
-	return sliced.trimEnd() + "…";
+	return closeDanglingBold(sliced.trimEnd()) + "…";
 }
 
 export class AnnotationView extends ItemView {
@@ -237,7 +249,13 @@ export class AnnotationView extends ItemView {
 			const quoteEl = card.createEl("blockquote", {
 				cls: "reading-annotation-quote",
 			});
-			quoteEl.setText(truncateQuote(entry.quote, 150));
+			void MarkdownRenderer.render(
+				this.app,
+				truncateQuote(entry.quote, 150),
+				quoteEl,
+				annotationPath,
+				this,
+			);
 
 			if (entry.comment) {
 				const commentEl = card.createDiv({

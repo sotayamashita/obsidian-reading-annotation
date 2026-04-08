@@ -29,6 +29,22 @@ describe("truncateQuote", () => {
 		const result = truncateQuote(q, 10);
 		expect(result).toBe("あ。い。う。え。お。…");
 	});
+
+	it("closes dangling bold marker when the cut lands mid-emphasis", () => {
+		const q = "これは **とても重要な ".repeat(20);
+		const result = truncateQuote(q, 15);
+		const withoutEllipsis = result.replace(/…$/, "");
+		const markers = withoutEllipsis.match(/\*\*/g) ?? [];
+		expect(markers.length % 2).toBe(0);
+	});
+
+	it("leaves paired bold markers alone", () => {
+		const q = "前置き **強調** です。" + "x".repeat(200);
+		const result = truncateQuote(q, 30);
+		const withoutEllipsis = result.replace(/…$/, "");
+		const markers = withoutEllipsis.match(/\*\*/g) ?? [];
+		expect(markers.length % 2).toBe(0);
+	});
 });
 
 describe("parseBlockquoteLine", () => {
