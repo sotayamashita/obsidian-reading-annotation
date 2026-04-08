@@ -211,12 +211,19 @@ export class AnnotationView extends ItemView {
 
 			const cardHeader = card.createDiv({ cls: "reading-annotation-card-header" });
 
+			const badgeClasses = [
+				"reading-annotation-badge",
+				`reading-annotation-badge-${entry.type}`,
+			];
+			if (entry.blockId) badgeClasses.push("reading-annotation-badge-interactive");
 			const badge = cardHeader.createEl("span", {
 				text: entry.typeLabel,
-				cls: `reading-annotation-badge reading-annotation-badge-${entry.type} clickable-icon`,
+				cls: badgeClasses.join(" "),
 			});
 
 			if (entry.blockId) {
+				badge.setAttribute("role", "button");
+				badge.setAttribute("aria-label", "Change annotation type");
 				badge.addEventListener("click", (e) => {
 					const menu = new Menu();
 					for (const t of ANNOTATION_TYPES) {

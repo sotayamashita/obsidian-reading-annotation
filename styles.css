@@ -93,6 +93,23 @@ body {
 	color: var(--text-on-accent);
 }
 
+/*
+ * Only badges tied to an annotation with a blockId are clickable (they
+ * open a type-change menu). Give those a cursor and a subtle hover
+ * highlight so the affordance is visible. Non-interactive badges (no
+ * blockId) stay plain to avoid lying about what is clickable. We avoid
+ * the .clickable-icon Obsidian helper because its hover rule replaces
+ * background-color with a neutral gray, flattening our colored badges.
+ */
+.reading-annotation-badge-interactive {
+	cursor: pointer;
+	transition: filter 120ms ease-out;
+}
+
+.reading-annotation-badge-interactive:hover {
+	filter: brightness(1.1);
+}
+
 .reading-annotation-badge-surprise {
 	background: var(--ra-color-surprise);
 }
