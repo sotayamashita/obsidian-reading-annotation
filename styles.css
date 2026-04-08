@@ -120,21 +120,33 @@ body {
 
 /*
  * Quote is someone else's words; comment is the reader's own thought.
- * Keep the quote one step smaller and fainter than the comment so the
- * reader's own voice reads as primary in a Zettelkasten workflow.
+ * Differentiate by glyph shape (italic + left rule), not by color — both
+ * need full WCAG AA contrast, especially on tinted high-priority cards
+ * where a muted gray would drop below 4.5:1.
+ *
+ * line-height 1.65: Material Design 3 recommends ~1.5× font-size for body
+ * leading; we nudge it to 1.65 because Japanese glyphs are visually denser
+ * than Latin and need more vertical breathing room to avoid looking packed.
+ *
+ * Vertical rhythm: quote/comment margins use --size-4-3 (12px) instead of
+ * --size-4-2 (8px) so the two voices (cited source vs reader's thought)
+ * read as separate paragraphs, not a single block.
  */
 .reading-annotation-quote {
-	font-size: var(--font-ui-smaller);
-	color: var(--text-faint);
+	font-size: var(--font-ui-small);
+	line-height: 1.65;
+	color: var(--text-normal);
+	font-style: italic;
 	border-left: 2px solid var(--background-modifier-border);
 	padding-left: var(--size-4-3);
-	margin: var(--size-4-2) 0;
+	margin: var(--size-4-3) 0;
 }
 
 .reading-annotation-comment {
 	font-size: var(--font-ui-small);
+	line-height: 1.65;
 	color: var(--text-normal);
-	margin: var(--size-4-2) 0 0 0;
+	margin: var(--size-4-3) 0 0 0;
 }
 
 /* Inline highlights */
