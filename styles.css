@@ -29,8 +29,7 @@ body {
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.reading-annotation-header h4 {
-	margin: 0;
+.reading-annotation-header-title {
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
 	text-transform: uppercase;
@@ -112,9 +111,8 @@ body {
 .reading-annotation-badge {
 	display: inline-block;
 	font-size: var(--font-ui-smaller);
-	padding: 1px 8px;
+	padding: 1px var(--size-4-2);
 	border-radius: var(--radius-s);
-	margin-bottom: var(--size-4-2);
 	font-weight: var(--font-semibold);
 	color: var(--text-on-accent);
 }
@@ -236,6 +234,10 @@ body {
 .reading-annotation-hl-note {
 	background: var(--background-modifier-hover);
 	border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.reading-annotation-comment-input {
+	width: 100%;
 }
 
 .reading-annotation-preview blockquote {

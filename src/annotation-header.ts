@@ -16,7 +16,7 @@ export function renderHeader(
 	count: number,
 	onOpenFile: () => void,
 ): void {
-	container.createEl("h4", {
+	container.createEl("div", {
 		text: `Annotations (${count})`,
 		cls: "reading-annotation-header-title",
 	});

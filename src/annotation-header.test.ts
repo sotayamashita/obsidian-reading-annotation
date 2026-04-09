@@ -42,9 +42,11 @@ describe("renderHeader", () => {
 
 		renderHeader(container as unknown as HeaderContainer, 3, onOpenFile);
 
-		const h4 = container.children.find((c) => c.tag === "h4");
-		expect(h4).toBeDefined();
-		expect(h4!.text).toBe("Annotations (3)");
+		const title = container.children.find(
+			(c) => c.tag === "div" && c.cls === "reading-annotation-header-title",
+		);
+		expect(title).toBeDefined();
+		expect(title!.text).toBe("Annotations (3)");
 
 		const button = container.children.find((c) => c.tag === "button");
 		expect(button).toBeDefined();

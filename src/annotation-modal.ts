@@ -1,4 +1,5 @@
 import { App, Modal, Setting } from "obsidian";
+import { truncateQuote } from "annotation-view";
 import { ANNOTATION_TYPES, type AnnotationType } from "annotation-types";
 
 const PREVIEW_MAX_LENGTH = 200;
@@ -23,10 +24,7 @@ export class AnnotationModal extends Modal {
 		this.setTitle("Annotate");
 		const { contentEl } = this;
 
-		const preview =
-			this.selectedText.length > PREVIEW_MAX_LENGTH
-				? this.selectedText.slice(0, PREVIEW_MAX_LENGTH) + "..."
-				: this.selectedText;
+		const preview = truncateQuote(this.selectedText, PREVIEW_MAX_LENGTH);
 
 		const previewEl = contentEl.createDiv({
 			cls: "reading-annotation-preview",
@@ -46,7 +44,7 @@ export class AnnotationModal extends Modal {
 
 		new Setting(contentEl).setName("Comment").addTextArea((textarea) => {
 			textarea.inputEl.rows = 4;
-			textarea.inputEl.setCssStyles({ width: "100%" });
+			textarea.inputEl.addClass("reading-annotation-comment-input");
 			textarea.onChange((value) => {
 				this.comment = value;
 			});
