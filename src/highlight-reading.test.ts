@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
-import type { AnnotationEntry } from "annotation-view";
+import type { AnnotationEntry } from "annotation-parser";
 import type { HighlightStore } from "highlight-store";
 import { highlightPostProcessor } from "highlight-reading";
 
@@ -43,7 +43,6 @@ describe("highlightPostProcessor", () => {
 		const entry: AnnotationEntry = {
 			quote,
 			type: "important",
-			typeLabel: "重要",
 			comment: "",
 			blockId: "ann-test",
 		};
@@ -53,5 +52,40 @@ describe("highlightPostProcessor", () => {
 
 		const span = el.querySelector("span.reading-annotation-hl-important");
 		expect(span?.textContent).toBe(quote);
+	});
+
+	it("highlights every occurrence of a repeated quote", () => {
+		const el = document.createElement("div");
+		const p = document.createElement("p");
+		p.append(document.createTextNode("cat dog cat"));
+		el.appendChild(p);
+
+		const entry: AnnotationEntry = {
+			quote: "cat",
+			type: "note",
+			comment: "",
+			blockId: "ann-1",
+		};
+
+		highlightPostProcessor(makeStore([entry]))(el, makeCtx("40-raw/x.md") as never);
+
+		expect(el.querySelectorAll("span.reading-annotation-hl-note")).toHaveLength(2);
+	});
+
+	it("highlights two quotes that fall in the same text node", () => {
+		const el = document.createElement("div");
+		const p = document.createElement("p");
+		p.append(document.createTextNode("alpha beta gamma"));
+		el.appendChild(p);
+
+		const entries: AnnotationEntry[] = [
+			{ quote: "alpha", type: "note", comment: "", blockId: "ann-1" },
+			{ quote: "gamma", type: "important", comment: "", blockId: "ann-2" },
+		];
+
+		highlightPostProcessor(makeStore(entries))(el, makeCtx("40-raw/x.md") as never);
+
+		expect(el.querySelector("span.reading-annotation-hl-note")?.textContent).toBe("alpha");
+		expect(el.querySelector("span.reading-annotation-hl-important")?.textContent).toBe("gamma");
 	});
 });
