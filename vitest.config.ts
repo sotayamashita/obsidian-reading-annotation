@@ -10,6 +10,7 @@ export default defineConfig({
 			"annotation-view": resolve(__dirname, "src/annotation-view.ts"),
 			"annotation-header": resolve(__dirname, "src/annotation-header.ts"),
 			"annotation-updater": resolve(__dirname, "src/annotation-updater.ts"),
+			"annotation-parser": resolve(__dirname, "src/annotation-parser.ts"),
 			"text-match": resolve(__dirname, "src/text-match.ts"),
 			"highlight-store": resolve(__dirname, "src/highlight-store.ts"),
 			"highlight-reading": resolve(__dirname, "src/highlight-reading.ts"),

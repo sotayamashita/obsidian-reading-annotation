@@ -54,4 +54,47 @@ describe("replaceAnnotationType", () => {
 		expect(result).toContain("> [!caution] 注意");
 		expect(result).not.toContain("> [!resonance]");
 	});
+
+	it("does not rewrite a sibling whose block ID extends the target id", () => {
+		const multiContent = [
+			"---",
+			"type: reading-annotation",
+			"---",
+			"",
+			"> First ^ann-1",
+			"",
+			"> [!surprise] 驚き",
+			"> c1",
+			"",
+			"---",
+			"",
+			"> Second ^ann-1x",
+			"",
+			"> [!resonance] 共感",
+			"> c2",
+		].join("\n");
+
+		const result = replaceAnnotationType(multiContent, "ann-1", "caution");
+		expect(result).toContain("> [!caution] 注意");
+		expect(result).toContain("> [!resonance] 共感");
+		expect(result.match(/\[!caution\]/g)).toHaveLength(1);
+	});
+
+	it("changes the callout header, not a quote line that starts with [!word]", () => {
+		const content = [
+			"---",
+			"type: reading-annotation",
+			"---",
+			"",
+			"> [!important] keep this quote ^ann-xyz",
+			"",
+			"> [!surprise] 驚き",
+			"> my comment",
+		].join("\n");
+
+		const result = replaceAnnotationType(content, "ann-xyz", "question");
+		expect(result).toContain("> [!important] keep this quote ^ann-xyz");
+		expect(result).toContain("> [!question] 疑問");
+		expect(result).not.toContain("> [!surprise] 驚き");
+	});
 });

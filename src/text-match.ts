@@ -52,3 +52,41 @@ export function mapNormalizedRange(
 	}
 	return { from: pos[normalizedStart]!, to: pos[normalizedEnd]! };
 }
+
+/**
+ * Find every occurrence of `normalizedQuote` within `normalizedDoc` and map each
+ * back to an original-text range (shifted by `offset`). Shared by the editor
+ * decorations and the reading-mode post-processor so the match semantics stay
+ * in one place.
+ */
+export function findQuoteRanges(
+	normalizedDoc: string,
+	docText: string,
+	normalizedQuote: string,
+	offset: number,
+): Array<{ from: number; to: number }> {
+	const ranges: Array<{ from: number; to: number }> = [];
+
+	let searchFrom = 0;
+	while (searchFrom < normalizedDoc.length) {
+		const matchIndex = normalizedDoc.indexOf(normalizedQuote, searchFrom);
+		if (matchIndex === -1) break;
+
+		const originalRange = mapNormalizedRange(
+			docText,
+			matchIndex,
+			matchIndex + normalizedQuote.length,
+		);
+
+		if (originalRange) {
+			ranges.push({
+				from: originalRange.from + offset,
+				to: originalRange.to + offset,
+			});
+		}
+
+		searchFrom = matchIndex + normalizedQuote.length;
+	}
+
+	return ranges;
+}
