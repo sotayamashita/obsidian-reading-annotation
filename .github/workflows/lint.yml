@@ -1,10 +1,13 @@
-name: Node.js build
+name: CI
 
 on:
     push:
         branches: ["**"]
     pull_request:
         branches: ["**"]
+
+permissions:
+    contents: read
 
 jobs:
     build:
@@ -16,12 +19,17 @@ jobs:
                 # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  persist-credentials: false
+            - name: Install pnpm
+              uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: "npm"
-            - run: npm ci
-            - run: npm run build --if-present
-            - run: npm run lint
+                  cache: "pnpm"
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm run build
+            - run: pnpm run lint
+            - run: pnpm test
