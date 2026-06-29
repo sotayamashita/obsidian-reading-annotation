@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest";
 import { TFile, type Vault } from "obsidian";
 import { createHighlightStore } from "highlight-store";
 
+type RuntimeTFileConstructor = new (path: string) => TFile;
+
+const RuntimeTFile = TFile as unknown as RuntimeTFileConstructor;
+
 function makeVault(content: string): Vault {
-	const file = Object.assign(Object.create(TFile.prototype) as TFile, {
-		path: "42-annotation/Article.md",
-	});
+	const file = new RuntimeTFile("42-annotation/Article.md");
 	return {
 		getAbstractFileByPath: (path: string) => (path === file.path ? file : null),
 		cachedRead: async () => content,

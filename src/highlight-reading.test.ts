@@ -57,7 +57,7 @@ describe("highlightPostProcessor", () => {
 	it("highlights every occurrence of a repeated quote", () => {
 		const el = document.createElement("div");
 		const p = document.createElement("p");
-		p.textContent = "cat dog cat";
+		p.append(document.createTextNode("cat dog cat"));
 		el.appendChild(p);
 
 		const entry: AnnotationEntry = {
@@ -75,7 +75,7 @@ describe("highlightPostProcessor", () => {
 	it("highlights two quotes that fall in the same text node", () => {
 		const el = document.createElement("div");
 		const p = document.createElement("p");
-		p.textContent = "alpha beta gamma";
+		p.append(document.createTextNode("alpha beta gamma"));
 		el.appendChild(p);
 
 		const entries: AnnotationEntry[] = [
