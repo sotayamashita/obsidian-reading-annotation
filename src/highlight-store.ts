@@ -1,6 +1,6 @@
 import { TFile, type Vault } from "obsidian";
 import { getAnnotationPath } from "annotation-writer";
-import { type AnnotationEntry, parseAnnotationFile } from "annotation-view";
+import { type AnnotationEntry, parseAnnotationFile } from "annotation-parser";
 
 export interface HighlightStore {
 	getAnnotations(sourcePath: string): AnnotationEntry[];

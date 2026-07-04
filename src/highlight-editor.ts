@@ -9,39 +9,7 @@ import {
 import { editorInfoField } from "obsidian";
 import { isAnnotationPath } from "annotation-types";
 import type { HighlightStore } from "highlight-store";
-import { mapNormalizedRange, normalizeWhitespace } from "text-match";
-
-function findQuoteRanges(
-	normalizedDoc: string,
-	docText: string,
-	normalizedQuote: string,
-	offset: number,
-): Array<{ from: number; to: number }> {
-	const ranges: Array<{ from: number; to: number }> = [];
-
-	let searchFrom = 0;
-	while (searchFrom < normalizedDoc.length) {
-		const matchIndex = normalizedDoc.indexOf(normalizedQuote, searchFrom);
-		if (matchIndex === -1) break;
-
-		const originalRange = mapNormalizedRange(
-			docText,
-			matchIndex,
-			matchIndex + normalizedQuote.length,
-		);
-
-		if (originalRange) {
-			ranges.push({
-				from: originalRange.from + offset,
-				to: originalRange.to + offset,
-			});
-		}
-
-		searchFrom = matchIndex + normalizedQuote.length;
-	}
-
-	return ranges;
-}
+import { findQuoteRanges, normalizeWhitespace } from "text-match";
 
 const refreshHighlightsEffect = StateEffect.define<null>();
 
@@ -75,7 +43,10 @@ export function createHighlightExtension(store: HighlightStore): Extension {
 					tr.effects.some((e) => e.is(refreshHighlightsEffect)),
 				);
 
-				if (update.docChanged || update.viewportChanged || hasRefreshEffect) {
+				// Decorations are computed over the whole document, so they do
+				// not depend on the viewport — only rebuild when the text or the
+				// annotation set actually changes.
+				if (update.docChanged || hasRefreshEffect) {
 					this.decorations = this.buildDecorations(update.view);
 				}
 			}
@@ -90,23 +61,19 @@ export function createHighlightExtension(store: HighlightStore): Extension {
 
 				const allRanges: Array<{ from: number; to: number; type: string }> = [];
 
-				for (const { from: vpFrom, to: vpTo } of view.visibleRanges) {
-					const docText = view.state.doc.sliceString(vpFrom, vpTo);
-					const normalizedDoc = normalizeWhitespace(docText);
+				// Search the whole document, not each visible range slice: a quote
+				// that straddles a viewport (or fold) boundary is split across
+				// slices and would otherwise never match.
+				const docText = view.state.doc.toString();
+				const normalizedDoc = normalizeWhitespace(docText);
 
-					for (const entry of entries) {
-						const normalizedQuote = normalizeWhitespace(entry.quote);
-						if (normalizedQuote === "") continue;
+				for (const entry of entries) {
+					const normalizedQuote = normalizeWhitespace(entry.quote);
+					if (normalizedQuote === "") continue;
 
-						const ranges = findQuoteRanges(
-							normalizedDoc,
-							docText,
-							normalizedQuote,
-							vpFrom,
-						);
-						for (const range of ranges) {
-							allRanges.push({ ...range, type: entry.type });
-						}
+					const ranges = findQuoteRanges(normalizedDoc, docText, normalizedQuote, 0);
+					for (const range of ranges) {
+						allRanges.push({ ...range, type: entry.type });
 					}
 				}
 

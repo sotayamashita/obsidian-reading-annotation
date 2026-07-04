@@ -49,6 +49,9 @@ export class AnnotationModal extends Modal {
 				this.comment = value;
 			});
 			textarea.inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
+				// Ignore Enter while an IME composition is in flight, so confirming
+				// a Japanese conversion does not submit and close the modal.
+				if (e.isComposing) return;
 				if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
 					e.preventDefault();
 					this.submit();

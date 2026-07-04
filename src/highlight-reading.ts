@@ -1,7 +1,7 @@
 import type { MarkdownPostProcessorContext } from "obsidian";
 import type { HighlightStore } from "highlight-store";
 import { isAnnotationPath } from "annotation-types";
-import { mapNormalizedRange, normalizeWhitespace } from "text-match";
+import { findQuoteRanges, normalizeWhitespace } from "text-match";
 
 interface TextSegment {
 	node: Text;
@@ -79,22 +79,29 @@ export function highlightPostProcessor(
 		const fullText = segments.map((s) => s.text).join("");
 		const normalizedFull = normalizeWhitespace(fullText);
 
+		// Collect every match range first (all entries, every occurrence) against
+		// the stable full text, before any DOM mutation.
+		const ranges: Array<{ from: number; to: number; type: string }> = [];
 		for (const entry of entries) {
 			const normalizedQuote = normalizeWhitespace(entry.quote);
 			if (normalizedQuote === "") continue;
 
-			const matchIndex = normalizedFull.indexOf(normalizedQuote);
-			if (matchIndex === -1) continue;
+			for (const range of findQuoteRanges(normalizedFull, fullText, normalizedQuote, 0)) {
+				ranges.push({ from: range.from, to: range.to, type: entry.type });
+			}
+		}
 
-			const range = mapNormalizedRange(
-				fullText,
-				matchIndex,
-				matchIndex + normalizedQuote.length,
-			);
-			if (!range) continue;
-
-			const cssClass = `reading-annotation-hl reading-annotation-hl-${entry.type}`;
-			wrapMatchInSegments(segments, range.from, range.to, cssClass);
+		// Apply non-overlapping ranges. Re-collect segments before each wrap:
+		// wrapMatchInSegments replaces text nodes, so a cached segments array
+		// would point at detached nodes and silently drop a later highlight that
+		// lands in the same original text node.
+		ranges.sort((a, b) => a.from - b.from || a.to - b.to);
+		let lastTo = -1;
+		for (const range of ranges) {
+			if (range.from < lastTo) continue;
+			const cssClass = `reading-annotation-hl reading-annotation-hl-${range.type}`;
+			wrapMatchInSegments(collectTextSegments(el), range.from, range.to, cssClass);
+			lastTo = range.to;
 		}
 	};
 }

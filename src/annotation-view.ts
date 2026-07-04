@@ -1,77 +1,20 @@
-import { debounce, ItemView, MarkdownRenderer, Menu, setIcon, TFile } from "obsidian";
+import {
+	Component,
+	debounce,
+	ItemView,
+	MarkdownRenderer,
+	Menu,
+	setIcon,
+	TFile,
+	type WorkspaceLeaf,
+} from "obsidian";
 import { renderHeader } from "annotation-header";
 import { ANNOTATION_TYPES } from "annotation-types";
 import { replaceAnnotationType } from "annotation-updater";
-import { BLOCK_ID_PATTERN, getAnnotationPath } from "annotation-writer";
+import { getAnnotationPath } from "annotation-writer";
+import type { HighlightStore } from "highlight-store";
 
 export const VIEW_TYPE_ANNOTATION = "reading-annotation-view";
-
-export interface AnnotationEntry {
-	quote: string;
-	type: string;
-	typeLabel: string;
-	comment: string;
-	blockId: string;
-}
-
-export function parseBlockquoteLine(line: string): string | null {
-	if (line.startsWith("> ")) return line.slice(2);
-	if (line === ">") return "";
-	return null;
-}
-
-export function parseAnnotationFile(content: string): AnnotationEntry[] {
-	const bodyMatch = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
-	if (!bodyMatch) return [];
-	const body = bodyMatch[1]!;
-
-	const blocks = body.split(/\n---\n/).filter((b) => /^>/m.test(b));
-	const entries: AnnotationEntry[] = [];
-
-	for (const block of blocks) {
-		const lines = block.trim().split("\n");
-		const quoteLines: string[] = [];
-		let type = "";
-		let blockId = "";
-		const commentLines: string[] = [];
-		let inCallout = false;
-
-		for (const line of lines) {
-			const calloutMatch = line.match(/^>\s*\[!(\w+)\].*$/);
-			if (calloutMatch) {
-				type = calloutMatch[1]!;
-				inCallout = true;
-				continue;
-			}
-
-			const parsed = parseBlockquoteLine(line);
-			if (parsed !== null) {
-				if (inCallout) {
-					commentLines.push(parsed);
-				} else {
-					const blockIdMatch = parsed.match(BLOCK_ID_PATTERN);
-					if (blockIdMatch) {
-						blockId = blockIdMatch[1]!;
-						quoteLines.push(parsed.replace(BLOCK_ID_PATTERN, ""));
-					} else {
-						quoteLines.push(parsed);
-					}
-				}
-			}
-		}
-
-		const typeInfo = ANNOTATION_TYPES.find((t) => t.id === type);
-		entries.push({
-			quote: quoteLines.join("\n").trim(),
-			type,
-			typeLabel: typeInfo?.label ?? type,
-			comment: commentLines.join("\n").trim(),
-			blockId,
-		});
-	}
-
-	return entries;
-}
 
 const DEBOUNCE_MS = 300;
 
@@ -114,9 +57,17 @@ export function truncateQuote(quote: string, limit: number): string {
 export class AnnotationView extends ItemView {
 	private lastFilePath: string | null = null;
 	private pendingFlashBlockId: string | null = null;
+	private renderComponent: Component | null = null;
 	private readonly debouncedRefresh = debounce(() => {
-		void this.refresh();
+		this.refresh();
 	}, DEBOUNCE_MS);
+
+	constructor(
+		leaf: WorkspaceLeaf,
+		private readonly store: HighlightStore,
+	) {
+		super(leaf);
+	}
 
 	override getViewType(): string {
 		return VIEW_TYPE_ANNOTATION;
@@ -131,27 +82,23 @@ export class AnnotationView extends ItemView {
 	}
 
 	override async onOpen(): Promise<void> {
+		// Switch the displayed file when the active leaf changes.
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", () => {
-				const activeFile = this.app.workspace.getActiveFile();
-				const newPath = activeFile?.path ?? null;
-				if (newPath !== this.lastFilePath) {
-					void this.refresh();
-				}
+				const newPath = this.app.workspace.getActiveFile()?.path ?? null;
+				if (newPath !== this.lastFilePath) this.refresh();
 			}),
 		);
-		this.registerEvent(
-			this.app.vault.on("modify", (file) => {
-				if (!(file instanceof TFile)) return;
-				const activeFile = this.app.workspace.getActiveFile();
-				if (!activeFile) return;
-				const expectedPath = getAnnotationPath(activeFile.path);
-				if (file.path === expectedPath) {
+		// Re-render when the store's entries for the active file change, instead
+		// of re-reading and re-parsing the annotation file ourselves.
+		this.register(
+			this.store.onDidChange((sourcePath) => {
+				if (sourcePath === this.app.workspace.getActiveFile()?.path) {
 					this.debouncedRefresh();
 				}
 			}),
 		);
-		void this.refresh();
+		this.refresh();
 	}
 
 	override async onClose(): Promise<void> {
@@ -159,8 +106,14 @@ export class AnnotationView extends ItemView {
 		this.contentEl.empty();
 	}
 
-	private async refresh(): Promise<void> {
+	private refresh(): void {
 		const container = this.contentEl;
+		// Unload the markdown child components from the previous render; empty()
+		// only clears the DOM and would otherwise leak one Component per refresh.
+		if (this.renderComponent) {
+			this.removeChild(this.renderComponent);
+			this.renderComponent = null;
+		}
 		container.empty();
 
 		const activeFile = this.app.workspace.getActiveFile();
@@ -174,10 +127,9 @@ export class AnnotationView extends ItemView {
 		}
 
 		this.lastFilePath = activeFile.path;
-		const annotationPath = getAnnotationPath(activeFile.path);
-		const annotationFile = this.app.vault.getAbstractFileByPath(annotationPath);
+		const entries = this.store.getAnnotations(activeFile.path);
 
-		if (!(annotationFile instanceof TFile)) {
+		if (entries.length === 0) {
 			container.createEl("p", {
 				text: "No annotations for this file",
 				cls: "reading-annotation-empty",
@@ -185,16 +137,9 @@ export class AnnotationView extends ItemView {
 			return;
 		}
 
-		const content = await this.app.vault.cachedRead(annotationFile);
-		const entries = parseAnnotationFile(content);
-
-		if (entries.length === 0) {
-			container.createEl("p", {
-				text: "No annotations found",
-				cls: "reading-annotation-empty",
-			});
-			return;
-		}
+		const annotationPath = getAnnotationPath(activeFile.path);
+		const annotationFile = this.app.vault.getAbstractFileByPath(annotationPath);
+		const editableFile = annotationFile instanceof TFile ? annotationFile : null;
 
 		const header = container.createDiv({
 			cls: "reading-annotation-header",
@@ -204,6 +149,11 @@ export class AnnotationView extends ItemView {
 		});
 
 		const list = container.createDiv({ cls: "reading-annotation-list" });
+
+		// One child component per render pass; unloaded at the next refresh.
+		const renderComponent = new Component();
+		this.addChild(renderComponent);
+		this.renderComponent = renderComponent;
 
 		for (const entry of entries) {
 			const cardClasses = [
@@ -222,13 +172,17 @@ export class AnnotationView extends ItemView {
 				"reading-annotation-badge",
 				`reading-annotation-badge-${entry.type}`,
 			];
-			if (entry.blockId) badgeClasses.push("reading-annotation-badge-interactive");
+			if (entry.blockId && editableFile) {
+				badgeClasses.push("reading-annotation-badge-interactive");
+			}
+			const typeLabel =
+				ANNOTATION_TYPES.find((t) => t.id === entry.type)?.label ?? entry.type;
 			const badge = cardHeader.createEl("span", {
-				text: entry.typeLabel,
+				text: typeLabel,
 				cls: badgeClasses.join(" "),
 			});
 
-			if (entry.blockId) {
+			if (entry.blockId && editableFile) {
 				badge.setAttribute("role", "button");
 				badge.setAttribute("aria-label", "Change annotation type");
 				badge.addEventListener("click", (e) => {
@@ -240,7 +194,7 @@ export class AnnotationView extends ItemView {
 								.setIcon(t.icon)
 								.onClick(() => {
 									this.pendingFlashBlockId = entry.blockId;
-									void this.app.vault.process(annotationFile, (data) =>
+									void this.app.vault.process(editableFile, (data) =>
 										replaceAnnotationType(data, entry.blockId, t.id),
 									);
 								});
@@ -269,7 +223,7 @@ export class AnnotationView extends ItemView {
 				truncateQuote(entry.quote, 150),
 				quoteEl,
 				annotationPath,
-				this,
+				renderComponent,
 			);
 
 			if (entry.comment) {
@@ -281,7 +235,7 @@ export class AnnotationView extends ItemView {
 					entry.comment,
 					commentEl,
 					annotationPath,
-					this,
+					renderComponent,
 				);
 			}
 		}
