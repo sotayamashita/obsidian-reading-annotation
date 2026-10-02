@@ -50,6 +50,17 @@ export default class ReadingAnnotationPlugin extends Plugin {
 		});
 		this.register(unsubscribe);
 
+		this.app.workspace.onLayoutReady(() => {
+			const paths = new Set<string>();
+			this.app.workspace.iterateAllLeaves((leaf) => {
+				if (leaf.view instanceof MarkdownView && leaf.view.file) {
+					paths.add(leaf.view.file.path);
+				}
+			});
+
+			for (const path of paths) void store.refreshForPath(path);
+		});
+
 		// Refresh every open pane whose annotation file changed — created,
 		// modified, deleted, or renamed — not just the active one, so split
 		// panes and background notes stay in sync with what is on disk.
