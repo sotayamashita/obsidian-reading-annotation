@@ -7,7 +7,8 @@
 		"node_modules/**",
 		"pnpm-lock.yaml",
 		"main.js",
-		"reports/**"
+		"reports/**",
+		"e2e/cases/*.md"
 	],
 	"minLines": 10
 }

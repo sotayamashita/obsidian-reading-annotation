@@ -1,0 +1,6 @@
+{
+	"obsidianCommand": "obsidian",
+	"obsidianVaultPath": "/absolute/path/to/reading-annotation-test",
+	"reportDir": "reports/e2e",
+	"caseDir": "e2e/cases"
+}
