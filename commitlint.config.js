@@ -2,15 +2,16 @@
 export default {
 	extends: ["@commitlint/config-conventional"],
 	rules: {
-		// Custom rule: prohibit @ mentions
+		"header-max-length": [2, "always", 72],
 		"no-github-mentions": [2, "always"],
 	},
 	plugins: [
 		{
 			rules: {
 				"no-github-mentions": ({ raw }) => {
-					// Check for @ mentions (excluding email addresses)
-					const mentionPattern = /@[a-zA-Z0-9_-]+(?![a-zA-Z0-9_.-]*@)/g;
+					// メール、コード範囲、スコープ付きパッケージ名を除外。
+					const mentionPattern =
+						/(?<![\w.+-]|`[^`]*)@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?![\w/-])/gu;
 					const matches = raw.match(mentionPattern);
 
 					if (matches) {
