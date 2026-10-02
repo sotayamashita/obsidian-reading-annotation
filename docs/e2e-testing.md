@@ -16,12 +16,12 @@ plugin lifecycle.
   block-id generation, path mapping, whitespace/position mapping, reading-mode
   wrapping. Prefer it — it is fast, deterministic, and needs no Obsidian.
 - **obsidian-cli E2E** (this doc) is for behavior that only exists at runtime:
-  - vault `create`/`modify`/`delete`/`rename` → store refresh → re-render
-  - editor decorations (CodeMirror) and reading-mode highlights
-  - the annotation sidebar view (`reading-annotation-view`)
-  - "does it actually render / does it throw" smoke checks
+    - vault `create`/`modify`/`delete`/`rename` → store refresh → re-render
+    - editor decorations (CodeMirror) and reading-mode highlights
+    - the annotation sidebar view (`reading-annotation-view`)
+    - "does it actually render / does it throw" smoke checks
 
-If a behavior *can* be expressed as a Vitest test, do that instead. Reach for
+If a behavior _can_ be expressed as a Vitest test, do that instead. Reach for
 E2E only for the genuinely runtime-coupled cases.
 
 ## Prerequisites
@@ -30,11 +30,11 @@ E2E only for the genuinely runtime-coupled cases.
 - **obsidian-cli** — ships inside the app bundle at
   `/Applications/Obsidian.app/Contents/MacOS/obsidian-cli`, exposed on PATH as
   `obsidian` (a symlink). Confirm:
-  ```bash
-  obsidian vaults          # lists known vaults; proves the CLI talks to the running app
-  obsidian help            # full command list
-  obsidian help dev:dom    # help for a specific command
-  ```
+    ```bash
+    obsidian vaults          # lists known vaults; proves the CLI talks to the running app
+    obsidian help            # full command list
+    obsidian help dev:dom    # help for a specific command
+    ```
 - The CLI drives the **currently running** Obsidian. Target a specific vault with
   `vault=<name>` on every command, e.g. `obsidian vault=reading-annotation-test ...`.
 - A **dedicated test vault** — never test in a real notes vault (the recipes
@@ -77,6 +77,7 @@ Symlinking the build artifacts means a rebuild is picked up by a plugin reload
   map to the same `42-annotation/Sample.md`.
 
 Two consequences for tests:
+
 - You may replace `40-raw/`/`90-archive/` in every recipe below with any folder
   name (or none). Just keep the **basename** consistent between a source note,
   its annotation file, and the `source: "[[…]]"` frontmatter.
@@ -127,6 +128,7 @@ obsidian vault=reading-annotation-test dev:errors clear   # reset captured error
 ```
 
 Notes:
+
 - `node esbuild.config.mjs production` builds directly (avoids `pnpm`'s
   ignored-build-scripts gate). `pnpm build` also works but may prompt about build
   scripts; esbuild itself runs fine via its platform binary.
@@ -153,6 +155,7 @@ dev:screenshot                     capture a screenshot (good for visual confirm
 ```
 
 `command id` / `plugin id` for this plugin (from `manifest.json` + `src/main.ts`):
+
 - plugin id: `obsidian-reading-annotation`
 - commands: `obsidian-reading-annotation:open-annotation-panel`,
   `obsidian-reading-annotation:annotate`
@@ -198,7 +201,7 @@ obsidian $V eval code='app.vault.create("42-annotation/Sample.md",["---","source
 obsidian $V eval code='var f=app.vault.getAbstractFileByPath("42-annotation/Sample.md");if(f)app.vault.delete(f);"deleted"'
 ```
 
-Use external `create`/`delete` only for the initial *create* of a file with no
+Use external `create`/`delete` only for the initial _create_ of a file with no
 prior cache (that one path happens to be reliable), or for coarse setup/teardown
 where timing doesn't matter.
 
@@ -224,6 +227,7 @@ quotes in the shell.
 ### 5. Count highlights in ONE leaf and the RIGHT container
 
 `document.querySelectorAll(".reading-annotation-hl")` over-counts because:
+
 - every `open` call opens a **new tab/leaf**, so multiple panes accumulate; and
 - a `MarkdownView` holds **both** the (hidden) CodeMirror editor and the preview
   DOM, so a single annotated note can show the highlight twice.
@@ -347,16 +351,15 @@ The test vault itself is disposable — delete the directory to remove it entire
 
 ## Selectors & ids reference
 
-| Thing | Value |
-|---|---|
-| Plugin id | `obsidian-reading-annotation` |
-| Sidebar view type | `reading-annotation-view` |
-| Commands | `…:open-annotation-panel`, `…:annotate` |
-| Annotation dir | `42-annotation/` (`ANNOTATION_DIR`) |
-| Highlight span | `.reading-annotation-hl`, `.reading-annotation-hl-<type>` |
-| Editor container | `.cm-editor` (CodeMirror; source/live-preview) |
-| Reading container | `.markdown-reading-view` (preview) |
-| Sidebar card | `.reading-annotation-card` |
-| Interactive badge | `.reading-annotation-badge-interactive` |
-| Annotation types | surprise / resonance / question / caution / important / note |
-```
+| Thing             | Value                                                        |
+| ----------------- | ------------------------------------------------------------ |
+| Plugin id         | `obsidian-reading-annotation`                                |
+| Sidebar view type | `reading-annotation-view`                                    |
+| Commands          | `…:open-annotation-panel`, `…:annotate`                      |
+| Annotation dir    | `42-annotation/` (`ANNOTATION_DIR`)                          |
+| Highlight span    | `.reading-annotation-hl`, `.reading-annotation-hl-<type>`    |
+| Editor container  | `.cm-editor` (CodeMirror; source/live-preview)               |
+| Reading container | `.markdown-reading-view` (preview)                           |
+| Sidebar card      | `.reading-annotation-card`                                   |
+| Interactive badge | `.reading-annotation-badge-interactive`                      |
+| Annotation types  | surprise / resonance / question / caution / important / note |
