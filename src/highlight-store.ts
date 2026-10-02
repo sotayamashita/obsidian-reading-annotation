@@ -1,4 +1,5 @@
 import { TFile, type Vault } from "obsidian";
+import { ANNOTATION_DIR } from "annotation-types";
 import { getAnnotationPath } from "annotation-writer";
 import { type AnnotationEntry, parseAnnotationFile } from "annotation-parser";
 
@@ -24,7 +25,10 @@ function entriesEqual(a: AnnotationEntry[], b: AnnotationEntry[]): boolean {
 	return true;
 }
 
-export function createHighlightStore(vault: Vault): HighlightStore {
+export function createHighlightStore(
+	vault: Vault,
+	getDirectory = () => ANNOTATION_DIR,
+): HighlightStore {
 	const cache = new Map<string, AnnotationEntry[]>();
 	const listeners = new Set<(sourcePath: string) => void>();
 
@@ -40,7 +44,7 @@ export function createHighlightStore(vault: Vault): HighlightStore {
 		},
 
 		async refreshForPath(sourcePath: string): Promise<void> {
-			const annotationPath = getAnnotationPath(sourcePath);
+			const annotationPath = getAnnotationPath(sourcePath, getDirectory());
 			const file = vault.getAbstractFileByPath(annotationPath);
 
 			if (!(file instanceof TFile)) {
@@ -51,6 +55,7 @@ export function createHighlightStore(vault: Vault): HighlightStore {
 			}
 
 			const content = await vault.cachedRead(file);
+			if (annotationPath !== getAnnotationPath(sourcePath, getDirectory())) return;
 			const entries = parseAnnotationFile(content);
 			const previous = cache.get(sourcePath);
 

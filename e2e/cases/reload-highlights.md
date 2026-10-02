@@ -30,13 +30,13 @@ else
   HIGHLIGHTS="$HL_PREVIEW"
 fi
 wait_js "$HIGHLIGHTS === 2"
-obs read path=42-annotation/Sample.md > "$CASE_REPORT/before.md"
+obs read path=annotation/Sample.md > "$CASE_REPORT/before.md"
 capture_evidence
 obs plugin:reload id=obsidian-reading-annotation
 wait_js '!!app.plugins.plugins["obsidian-reading-annotation"]'
 wait_js "app.workspace.activeLeaf.view.file?.path === '40-raw/Sample.md' && app.workspace.activeLeaf.view.getMode() === '$MODE'"
 wait_js "$HIGHLIGHTS === 2"
-obs read path=42-annotation/Sample.md > "$CASE_REPORT/after.md"
+obs read path=annotation/Sample.md > "$CASE_REPORT/after.md"
 cmp "$CASE_REPORT/before.md" "$CASE_REPORT/after.md"
 no_errors
 ```
@@ -53,7 +53,7 @@ no_errors
 
 ```bash
 js "$HIGHLIGHTS" > "$CASE_REPORT/highlights.txt"
-obs read path=42-annotation/Sample.md > "$CASE_REPORT/after.md"
+obs read path=annotation/Sample.md > "$CASE_REPORT/after.md"
 cmp "$CASE_REPORT/before.md" "$CASE_REPORT/after.md"
 capture_evidence
 ```

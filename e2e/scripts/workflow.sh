@@ -19,7 +19,7 @@ prepare_vault() {
   unset CASE_REPORT CASE_ID || return
 
   mise exec -- pnpm build || return
-  mkdir -p "$TEST_VAULT/40-raw" "$TEST_VAULT/90-archive" "$TEST_VAULT/42-annotation" "$TEST_PLUGIN" "$REPORT" || return
+  mkdir -p "$TEST_VAULT/40-raw" "$TEST_VAULT/90-archive" "$TEST_VAULT/annotation" "$TEST_PLUGIN" "$REPORT" || return
   ln -sf "$REPO/main.js" "$TEST_PLUGIN/main.js" || return
   ln -sf "$REPO/manifest.json" "$TEST_PLUGIN/manifest.json" || return
   ln -sf "$REPO/styles.css" "$TEST_PLUGIN/styles.css" || return
@@ -96,8 +96,8 @@ retry_case() {
 
 cleanup() {
   capture_evidence || return
-  run_js 'for(const path of ["42-annotation/Sample.md","42-annotation/Other.md","42-annotation/Moved.md"]){const file=app.vault.getAbstractFileByPath(path);if(file)await app.vault.delete(file);}app.workspace.detachLeavesOfType("markdown");app.workspace.detachLeavesOfType("reading-annotation-view");' || return
-  wait_js '!["42-annotation/Sample.md","42-annotation/Other.md","42-annotation/Moved.md"].some(path=>app.vault.getAbstractFileByPath(path)) && app.workspace.getLeavesOfType("markdown").length === 0 && app.workspace.getLeavesOfType("reading-annotation-view").length === 0' || return
+  run_js 'for(const path of ["annotation/Sample.md","annotation/Other.md","annotation/Moved.md"]){const file=app.vault.getAbstractFileByPath(path);if(file)await app.vault.delete(file);}app.workspace.detachLeavesOfType("markdown");app.workspace.detachLeavesOfType("reading-annotation-view");' || return
+  wait_js '!["annotation/Sample.md","annotation/Other.md","annotation/Moved.md"].some(path=>app.vault.getAbstractFileByPath(path)) && app.workspace.getLeavesOfType("markdown").length === 0 && app.workspace.getLeavesOfType("reading-annotation-view").length === 0' || return
   obs eval 'code=delete globalThis.__readingAnnotationE2E;true' || return
   wait_js '!("__readingAnnotationE2E" in globalThis)' || return
   obs dev:debug off || return

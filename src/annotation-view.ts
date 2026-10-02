@@ -9,7 +9,7 @@ import {
 	type WorkspaceLeaf,
 } from "obsidian";
 import { renderHeader } from "annotation-header";
-import { ANNOTATION_TYPES } from "annotation-types";
+import { ANNOTATION_DIR, ANNOTATION_TYPES } from "annotation-types";
 import { replaceAnnotationType } from "annotation-updater";
 import { getAnnotationPath } from "annotation-writer";
 import type { HighlightStore } from "highlight-store";
@@ -65,6 +65,7 @@ export class AnnotationView extends ItemView {
 	constructor(
 		leaf: WorkspaceLeaf,
 		private readonly store: HighlightStore,
+		private readonly getDirectory = () => ANNOTATION_DIR,
 	) {
 		super(leaf);
 	}
@@ -106,7 +107,7 @@ export class AnnotationView extends ItemView {
 		this.contentEl.empty();
 	}
 
-	private refresh(): void {
+	refresh(): void {
 		const container = this.contentEl;
 		// Unload the markdown child components from the previous render; empty()
 		// only clears the DOM and would otherwise leak one Component per refresh.
@@ -137,7 +138,7 @@ export class AnnotationView extends ItemView {
 			return;
 		}
 
-		const annotationPath = getAnnotationPath(activeFile.path);
+		const annotationPath = getAnnotationPath(activeFile.path, this.getDirectory());
 		const annotationFile = this.app.vault.getAbstractFileByPath(annotationPath);
 		const editableFile = annotationFile instanceof TFile ? annotationFile : null;
 

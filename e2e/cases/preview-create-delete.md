@@ -26,7 +26,7 @@ wait_js 'document.hasFocus() && document.visibilityState === "visible"'
 wait_js "$HL_PREVIEW === 0"
 create_annotation Sample
 wait_js "$HL_PREVIEW === 2"
-run_js 'await app.vault.delete(app.vault.getAbstractFileByPath("42-annotation/Sample.md"));'
+run_js 'await app.vault.delete(app.vault.getAbstractFileByPath("annotation/Sample.md"));'
 wait_js "$HL_PREVIEW === 0"
 no_errors
 ```

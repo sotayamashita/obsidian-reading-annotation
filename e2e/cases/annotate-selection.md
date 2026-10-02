@@ -24,17 +24,17 @@ open "$TEST_VAULT_URI"
 open -a Obsidian
 open_note 40-raw/Sample.md source
 wait_js "$HL_EDITOR === 0"
-wait_js '!app.vault.getAbstractFileByPath("42-annotation/Sample.md")'
+wait_js '!app.vault.getAbstractFileByPath("annotation/Sample.md")'
 run_js 'app.workspace.activeLeaf.view.editor.setSelection({line:2,ch:16},{line:2,ch:19});'
 test "$(js 'app.workspace.activeLeaf.view.editor.getSelection()')" = fox
 obs command id=obsidian-reading-annotation:annotate
 wait_js '!!document.querySelector(".modal .reading-annotation-preview")'
 run_js 'const button=document.querySelector(".modal .mod-cta");if(!button)throw Error("Submit button missing");button.click();'
 wait_js 'Array.from(document.querySelectorAll(".notice")).some(el=>el.textContent==="Annotation saved")'
-wait_js '!!app.vault.getAbstractFileByPath("42-annotation/Sample.md")'
+wait_js '!!app.vault.getAbstractFileByPath("annotation/Sample.md")'
 wait_js 'app.workspace.activeLeaf.view.file?.path === "40-raw/Sample.md" && app.workspace.activeLeaf.view.getMode() === "source"'
 wait_js "$HL_EDITOR === 2"
-obs read path=42-annotation/Sample.md > "$CASE_REPORT/annotation.md"
+obs read path=annotation/Sample.md > "$CASE_REPORT/annotation.md"
 
 mise exec -- node --input-type=module - "$CASE_REPORT/annotation.md" <<'JS'
 import { readFileSync } from 'node:fs';

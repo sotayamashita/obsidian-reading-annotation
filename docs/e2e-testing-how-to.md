@@ -171,6 +171,7 @@ list_cases
 | H   | [同名ノートからの誤追記の拒否](../e2e/cases/basename-collision.md)    |
 | I   | [選択テキストからの注釈保存](../e2e/cases/annotate-selection.md)      |
 | J   | [再読み込み後のハイライト復元](../e2e/cases/reload-highlights.md)     |
+| K   | [設定画面からの注釈保存先変更](../e2e/cases/annotation-directory.md)  |
 
 各ケースの結果は`REPORT`配下のID別ディレクトリへの保存。
 同じIDの再実行も別ディレクトリ、ケース定義への実行結果の書き込みは対象外。
@@ -272,7 +273,7 @@ load_plugin
 `capture_evidence`の実行ごとに、新しい保存先の作成。
 CLI経由での取得失敗は`capture-errors.txt`への記録。
 
-初期化による削除対象は`42-annotation/`内の`Sample.md`・`Other.md`・`Moved.md`と、専用vaultのMarkdownタブ・注釈パネル。
+初期化による削除対象は`annotation/`内の`Sample.md`・`Other.md`・`Moved.md`と、専用vaultのMarkdownタブ・注釈パネル。
 未処理エラー検出時は、初期化前の証拠保存。
 
 ### CLIによる操作と非同期処理の完了待機

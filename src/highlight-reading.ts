@@ -1,6 +1,6 @@
 import type { MarkdownPostProcessorContext } from "obsidian";
 import type { HighlightStore } from "highlight-store";
-import { isAnnotationPath } from "annotation-types";
+import { ANNOTATION_DIR, isAnnotationPath } from "annotation-types";
 import { findQuoteRanges, normalizeWhitespace } from "text-match";
 
 interface TextSegment {
@@ -66,9 +66,10 @@ function wrapMatchInSegments(
 
 export function highlightPostProcessor(
 	store: HighlightStore,
+	getDirectory = () => ANNOTATION_DIR,
 ): (el: HTMLElement, ctx: MarkdownPostProcessorContext) => void {
 	return (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-		if (isAnnotationPath(ctx.sourcePath)) return;
+		if (isAnnotationPath(ctx.sourcePath, getDirectory())) return;
 
 		const entries = store.getAnnotations(ctx.sourcePath);
 		if (entries.length === 0) return;

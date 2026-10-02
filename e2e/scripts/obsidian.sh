@@ -65,7 +65,7 @@ capture_evidence() {
   obs dev:errors > "$evidence/errors.txt" 2>> "$evidence/capture-errors.txt"
   obs dev:console > "$evidence/console.txt" 2>> "$evidence/capture-errors.txt"
   js 'JSON.stringify({file:app.workspace.activeLeaf?.view.file?.path,mode:app.workspace.activeLeaf?.view.getMode?.(),focused:document.hasFocus(),visibility:document.visibilityState,highlights:app.workspace.activeLeaf?.view.containerEl.querySelectorAll(".cm-editor .reading-annotation-hl").length})' > "$evidence/state.json" 2>> "$evidence/capture-errors.txt"
-  cp -R "$TEST_VAULT/42-annotation" "$evidence/annotations"
+  cp -R "$TEST_VAULT/annotation" "$evidence/annotations"
   obs tabs > "$evidence/tabs.txt" 2>> "$evidence/capture-errors.txt"
   obs dev:dom selector=.reading-annotation-card total > "$evidence/cards.txt" 2>> "$evidence/capture-errors.txt"
   js 'JSON.stringify(app.workspace.getLeavesOfType("markdown").map(l=>({file:l.view.file?.path,mode:l.view.getMode(),editor:l.view.containerEl.querySelectorAll(".cm-editor .reading-annotation-hl").length,preview:l.view.containerEl.querySelectorAll(".markdown-reading-view .reading-annotation-hl").length})))' > "$evidence/panes.json" 2>> "$evidence/capture-errors.txt"
@@ -75,13 +75,13 @@ capture_evidence() {
 
 reset_case() {
   no_errors || return
-  run_js 'for(const path of ["42-annotation/Sample.md","42-annotation/Other.md","42-annotation/Moved.md"]){const file=app.vault.getAbstractFileByPath(path);if(file)await app.vault.delete(file);}app.workspace.detachLeavesOfType("markdown");app.workspace.detachLeavesOfType("reading-annotation-view");' || return
+  run_js 'for(const path of ["annotation/Sample.md","annotation/Other.md","annotation/Moved.md"]){const file=app.vault.getAbstractFileByPath(path);if(file)await app.vault.delete(file);}app.workspace.detachLeavesOfType("markdown");app.workspace.detachLeavesOfType("reading-annotation-view");' || return
   obs dev:errors clear || return
   obs dev:console clear
 }
 
 create_annotation() {
-  run_js "const name='$1';const q=String.fromCharCode(34);await app.vault.create('42-annotation/'+name+'.md',['---','source: '+q+'[[40-raw/'+name+']]'+q,'type: reading-annotation','---','', '> fox ^ann-1','', '> [!surprise] m','> c'].join(String.fromCharCode(10)));"
+  run_js "const name='$1';const q=String.fromCharCode(34);await app.vault.create('annotation/'+name+'.md',['---','source: '+q+'[[40-raw/'+name+']]'+q,'type: reading-annotation','---','', '> fox ^ann-1','', '> [!surprise] m','> c'].join(String.fromCharCode(10)));"
 }
 
 HL_EDITOR='app.workspace.activeLeaf.view.containerEl.querySelectorAll(".cm-editor .reading-annotation-hl").length'

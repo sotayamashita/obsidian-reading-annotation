@@ -2,7 +2,7 @@
 	"id": "obsidian-reading-annotation",
 	"name": "Reading Annotation",
 	"version": "0.1.0",
-	"minAppVersion": "0.15.0",
+	"minAppVersion": "1.13.0",
 	"description": "Annotate text while reading with four reaction types (surprise, resonance, question, caution). Saves structured annotation files that coding agents can parse.",
 	"author": "Sam Yamashita",
 	"isDesktopOnly": false

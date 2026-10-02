@@ -4,7 +4,7 @@ export interface AnnotationType {
 	icon: string;
 }
 
-export const ANNOTATION_DIR = "42-annotation";
+export const ANNOTATION_DIR = "annotation";
 
 export const ANNOTATION_TYPES: readonly AnnotationType[] = [
 	{ id: "surprise", label: "驚き", icon: "lightbulb" },
@@ -15,6 +15,6 @@ export const ANNOTATION_TYPES: readonly AnnotationType[] = [
 	{ id: "note", label: "メモ", icon: "pencil" },
 ] as const;
 
-export function isAnnotationPath(path: string): boolean {
-	return path.startsWith(ANNOTATION_DIR + "/");
+export function isAnnotationPath(path: string, directory = ANNOTATION_DIR): boolean {
+	return path.startsWith(directory + "/");
 }

@@ -22,9 +22,9 @@ reset_case
 open_note 40-raw/Sample.md source
 create_annotation Sample
 wait_js "$HL_EDITOR === 2"
-run_js 'await app.vault.rename(app.vault.getAbstractFileByPath("42-annotation/Sample.md"),"42-annotation/Moved.md");'
+run_js 'await app.vault.rename(app.vault.getAbstractFileByPath("annotation/Sample.md"),"annotation/Moved.md");'
 wait_js "$HL_EDITOR === 0"
-run_js 'await app.vault.rename(app.vault.getAbstractFileByPath("42-annotation/Moved.md"),"42-annotation/Sample.md");'
+run_js 'await app.vault.rename(app.vault.getAbstractFileByPath("annotation/Moved.md"),"annotation/Sample.md");'
 wait_js "$HL_EDITOR === 2"
 no_errors
 ```

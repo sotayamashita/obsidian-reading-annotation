@@ -13,16 +13,16 @@ import {
 } from "annotation-writer";
 
 describe("getAnnotationPath", () => {
-	it("extracts filename and places in 42-annotation/", () => {
-		expect(getAnnotationPath("40-raw/Article Title.md")).toBe("42-annotation/Article Title.md");
+	it("extracts filename and places in annotation/", () => {
+		expect(getAnnotationPath("40-raw/Article Title.md")).toBe("annotation/Article Title.md");
 	});
 
 	it("handles nested paths", () => {
-		expect(getAnnotationPath("some/deep/path/file.md")).toBe("42-annotation/file.md");
+		expect(getAnnotationPath("some/deep/path/file.md")).toBe("annotation/file.md");
 	});
 
 	it("handles bare filename", () => {
-		expect(getAnnotationPath("file.md")).toBe("42-annotation/file.md");
+		expect(getAnnotationPath("file.md")).toBe("annotation/file.md");
 	});
 });
 
@@ -181,11 +181,35 @@ describe("writeAnnotation", () => {
 		return vault;
 	}
 
+	it("creates and appends annotations in a custom nested folder", async () => {
+		const vault = makeVault();
+		await writeAnnotation(
+			vault as never,
+			"40-raw/A.md",
+			"first",
+			surprise,
+			"c1",
+			"Reading/Annotations",
+		);
+		await writeAnnotation(
+			vault as never,
+			"40-raw/A.md",
+			"second",
+			surprise,
+			"c2",
+			"Reading/Annotations",
+		);
+
+		expect(vault.files.get("Reading/Annotations/A.md")).toContain("first");
+		expect(vault.files.get("Reading/Annotations/A.md")).toContain("second");
+		expect(vault.files.has("annotation/A.md")).toBe(false);
+	});
+
 	it("assigns distinct block ids to two annotations of the same text", async () => {
 		const vault = makeVault();
 		await writeAnnotation(vault as never, "40-raw/A.md", "same text", surprise, "c1");
 		await writeAnnotation(vault as never, "40-raw/A.md", "same text", surprise, "c2");
-		const content = vault.files.get("42-annotation/A.md")!;
+		const content = vault.files.get("annotation/A.md")!;
 		const ids = [...content.matchAll(/\^(ann-[a-z0-9]+)/g)].map((m) => m[1]);
 		expect(ids).toHaveLength(2);
 		expect(new Set(ids).size).toBe(2);
@@ -193,18 +217,18 @@ describe("writeAnnotation", () => {
 
 	it("appends to the annotation file that belongs to the same note", async () => {
 		const vault = makeVault({
-			"42-annotation/A.md":
+			"annotation/A.md":
 				'---\nsource: "[[40-raw/A]]"\ntype: reading-annotation\n---\n\n> q ^ann-1\n\n> [!surprise] 驚き\n>',
 		});
 		await writeAnnotation(vault as never, "40-raw/A.md", "new text", surprise, "c");
-		const content = vault.files.get("42-annotation/A.md")!;
+		const content = vault.files.get("annotation/A.md")!;
 		expect(content).toContain("new text");
 		expect([...content.matchAll(/\^(ann-[a-z0-9]+)/g)]).toHaveLength(2);
 	});
 
 	it("refuses to write into an annotation file owned by a different note", async () => {
 		const vault = makeVault({
-			"42-annotation/A.md":
+			"annotation/A.md":
 				'---\nsource: "[[40-raw/A]]"\ntype: reading-annotation\n---\n\n> q ^ann-1\n\n> [!surprise] 驚き\n>',
 		});
 		await expect(

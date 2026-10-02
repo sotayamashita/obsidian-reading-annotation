@@ -44,9 +44,9 @@ export function extractAnnotationSource(content: string): string | null {
 	return match ? match[1]! : null;
 }
 
-export function getAnnotationPath(sourcePath: string): string {
+export function getAnnotationPath(sourcePath: string, directory = ANNOTATION_DIR): string {
 	const fileName = sourcePath.split("/").pop() ?? sourcePath;
-	return `${ANNOTATION_DIR}/${fileName}`;
+	return `${directory}/${fileName}`;
 }
 
 export function toBlockquote(text: string): string {
@@ -119,8 +119,9 @@ export async function writeAnnotation(
 	selectedText: string,
 	annotationType: AnnotationType,
 	comment: string,
+	directory = ANNOTATION_DIR,
 ): Promise<void> {
-	const annotationPath = getAnnotationPath(sourcePath);
+	const annotationPath = getAnnotationPath(sourcePath, directory);
 	const existing = vault.getAbstractFileByPath(annotationPath);
 
 	if (existing instanceof TFile) {
@@ -129,7 +130,7 @@ export async function writeAnnotation(
 	}
 
 	try {
-		await vault.createFolder(ANNOTATION_DIR);
+		await vault.createFolder(directory);
 	} catch {
 		// folder already exists
 	}

@@ -4,6 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
 	resolve: {
 		alias: {
+			settings: resolve(__dirname, "src/settings.ts"),
 			annotate: resolve(__dirname, "src/annotate.ts"),
 			"highlight-editor": resolve(__dirname, "src/highlight-editor.ts"),
 			"annotation-types": resolve(__dirname, "src/annotation-types.ts"),

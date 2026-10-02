@@ -55,6 +55,11 @@ export class Notice {
 }
 
 export class Plugin {
+	async loadData(): Promise<unknown> {
+		return null;
+	}
+	async saveData(_data: unknown): Promise<void> {}
+	addSettingTab(_tab: unknown): void {}
 	app = {};
 	addCommand(_cmd: unknown): void {}
 	registerEvent(_ref: unknown): void {}
@@ -101,4 +106,15 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 	const wrapper = fn as T & { cancel(): void };
 	wrapper.cancel = () => {};
 	return wrapper;
+}
+
+export class PluginSettingTab {
+	constructor(_app: unknown, _plugin: unknown) {}
+}
+
+export function normalizePath(path: string): string {
+	return path
+		.replace(/\\/g, "/")
+		.replace(/\/+/g, "/")
+		.replace(/^\/|\/$/g, "");
 }

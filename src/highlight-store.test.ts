@@ -7,7 +7,7 @@ type RuntimeTFileConstructor = new (path: string) => TFile;
 const RuntimeTFile = TFile as unknown as RuntimeTFileConstructor;
 
 function makeVault(content: string): Vault {
-	const file = new RuntimeTFile("42-annotation/Article.md");
+	const file = new RuntimeTFile("annotation/Article.md");
 	return {
 		getAbstractFileByPath: (path: string) => (path === file.path ? file : null),
 		cachedRead: async () => content,

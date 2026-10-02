@@ -22,9 +22,14 @@ function makeView(path: string | null, mode: "source" | "preview") {
 describe("initial highlight loading", () => {
 	beforeEach(() => vi.clearAllMocks());
 
-	it.each([true, false])(
-		"loads all open notes when layout is ready (already ready: %s)",
-		async (ready) => {
+	it.each([
+		[true, "annotation"],
+		[false, "annotation"],
+		[true, "Reading/Annotations"],
+		[false, "Reading/Annotations"],
+	] as const)(
+		"loads all open notes when layout is ready (already ready: %s, folder: %s)",
+		async (ready, directory) => {
 			const editor = makeView("notes/Editor.md", "source");
 			const preview = makeView("notes/Preview.md", "preview");
 			const duplicate = makeView("notes/Editor.md", "preview");
@@ -33,7 +38,7 @@ describe("initial highlight loading", () => {
 				(view) => ({ view }),
 			);
 			const files = ["Editor", "Preview"].map(
-				(name) => new RuntimeTFile(`42-annotation/${name}.md`),
+				(name) => new RuntimeTFile(`${directory}/${name}.md`),
 			);
 			const cachedRead = vi.fn(
 				async (file: TFile) =>
@@ -57,6 +62,7 @@ type: reading-annotation
 					cachedRead,
 				},
 				workspace: {
+					getLeavesOfType: () => [],
 					on: vi.fn(),
 					iterateAllLeaves: (callback: (leaf: (typeof leaves)[number]) => void) =>
 						leaves.forEach(callback),
@@ -68,6 +74,10 @@ type: reading-annotation
 			} as unknown as App;
 			const plugin = Object.assign(new ReadingAnnotationPlugin(app, {} as PluginManifest), {
 				app,
+				loadData: vi.fn(async () =>
+					directory === "annotation" ? null : { annotationDirectory: directory },
+				),
+				saveData: vi.fn(async () => {}),
 				register: vi.fn(),
 				registerMarkdownPostProcessor: vi.fn(),
 				registerEditorExtension: vi.fn(),
@@ -91,6 +101,19 @@ type: reading-annotation
 			expect(duplicate.previewMode.rerender).toHaveBeenCalledExactlyOnceWith(true);
 			expect(editor.previewMode.rerender).not.toHaveBeenCalled();
 			expect(empty.previewMode.rerender).not.toHaveBeenCalled();
+
+			await plugin.setAnnotationDirectory("Another/Folder/");
+
+			expect(plugin.saveData).toHaveBeenCalledWith({ annotationDirectory: "Another/Folder" });
+			expect(plugin.annotationDirectory).toBe("Another/Folder");
+			expect(store.getAnnotations("notes/Editor.md")).toEqual([]);
+			expect(store.getAnnotations("notes/Preview.md")).toEqual([]);
+			expect(preview.previewMode.rerender).toHaveBeenCalledTimes(2);
+
+			await plugin.setAnnotationDirectory(directory);
+
+			expect(store.getAnnotations("notes/Editor.md")).toHaveLength(1);
+			expect(store.getAnnotations("notes/Preview.md")).toHaveLength(1);
 		},
 	);
 });

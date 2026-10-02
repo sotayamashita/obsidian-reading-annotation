@@ -23,7 +23,7 @@ open_note 40-raw/Sample.md source
 create_annotation Sample
 obs command id=obsidian-reading-annotation:open-annotation-panel
 wait_js "$SIDEBAR === 1"
-run_js 'await app.vault.append(app.vault.getAbstractFileByPath("42-annotation/Sample.md"),["","","---","","> dog ^ann-2","","> [!note] m","> c2"].join(String.fromCharCode(10)));'
+run_js 'await app.vault.append(app.vault.getAbstractFileByPath("annotation/Sample.md"),["","","---","","> dog ^ann-2","","> [!note] m","> c2"].join(String.fromCharCode(10)));'
 wait_js "$SIDEBAR === 2"
 no_errors
 ```

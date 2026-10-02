@@ -22,14 +22,14 @@ CASE_REPORT=$(mktemp -d "$REPORT/$CASE_ID-XXXXXX")
 reset_case
 open_note 40-raw/Sample.md source
 create_annotation Sample
-BEFORE=$(obs read path=42-annotation/Sample.md)
+BEFORE=$(obs read path=annotation/Sample.md)
 open_note 90-archive/Sample.md source
 run_js 'app.workspace.activeLeaf.view.editor.setSelection({line:0,ch:2},{line:0,ch:9});'
 obs command id=obsidian-reading-annotation:annotate
 wait_js '!!document.querySelector(".modal .reading-annotation-preview")'
 run_js 'document.querySelector(".modal .mod-cta").click();'
 wait_js 'Array.from(document.querySelectorAll(".notice")).some(el=>el.textContent.includes("already belongs to a different note"))'
-test "$(obs read path=42-annotation/Sample.md)" = "$BEFORE"
+test "$(obs read path=annotation/Sample.md)" = "$BEFORE"
 no_errors
 obs dev:console level=error
 ```
