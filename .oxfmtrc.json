@@ -1,0 +1,15 @@
+{
+	"useTabs": true,
+	"tabWidth": 4,
+	"printWidth": 100,
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		".agents/**",
+		".claude/**",
+		"AGENTS.md",
+		"CLAUDE.md",
+		"README.md",
+		"pnpm-lock.yaml",
+		"main.js"
+	]
+}

@@ -160,7 +160,8 @@ describe("writeAnnotation", () => {
 	// The mock TFile takes a path; the real obsidian type declares a 0-arg
 	// constructor, so cast to construct a real mock instance (instanceof must
 	// still hold for writeAnnotation's TFile check).
-	const makeFile = (p: string): TFile => new (TFile as unknown as { new (path: string): TFile })(p);
+	const makeFile = (p: string): TFile =>
+		new (TFile as unknown as { new (path: string): TFile })(p);
 
 	function makeVault(initial: Record<string, string> = {}) {
 		const files = new Map(Object.entries(initial));

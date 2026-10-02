@@ -1,7 +1,7 @@
 import { TFile, type Vault } from "obsidian";
 import { ANNOTATION_DIR, type AnnotationType } from "annotation-types";
 
-export const BLOCK_ID_PREFIX = "ann-";
+const BLOCK_ID_PREFIX = "ann-";
 export const BLOCK_ID_PATTERN = /\s\^(ann-[a-z0-9]+)$/;
 export const CALLOUT_HEADER_PATTERN = /^(>\s*)\[!(\w+)\].*/m;
 

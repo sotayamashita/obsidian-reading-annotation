@@ -1,0 +1,13 @@
+{
+	"exitCode": 1,
+	"reporters": ["ai"],
+	"ignore": [
+		".agents/**",
+		".claude/**",
+		"node_modules/**",
+		"pnpm-lock.yaml",
+		"main.js",
+		"reports/**"
+	],
+	"minLines": 10
+}

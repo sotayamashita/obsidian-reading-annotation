@@ -70,9 +70,15 @@ export default class ReadingAnnotationPlugin extends Plugin {
 			if (isAnnotationPath(path)) refreshAffectedSources(path);
 		};
 
-		this.registerEvent(this.app.vault.on("create", (file) => onAnnotationFileChanged(file.path)));
-		this.registerEvent(this.app.vault.on("modify", (file) => onAnnotationFileChanged(file.path)));
-		this.registerEvent(this.app.vault.on("delete", (file) => onAnnotationFileChanged(file.path)));
+		this.registerEvent(
+			this.app.vault.on("create", (file) => onAnnotationFileChanged(file.path)),
+		);
+		this.registerEvent(
+			this.app.vault.on("modify", (file) => onAnnotationFileChanged(file.path)),
+		);
+		this.registerEvent(
+			this.app.vault.on("delete", (file) => onAnnotationFileChanged(file.path)),
+		);
 		this.registerEvent(
 			this.app.vault.on("rename", (file, oldPath) => {
 				onAnnotationFileChanged(oldPath);

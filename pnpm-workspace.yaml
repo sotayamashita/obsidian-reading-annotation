@@ -1,7 +1,8 @@
 packages:
     - "."
 
-allowBuilds:
-    esbuild: false
+minimumReleaseAge: 10080
+savePrefix: ""
 
-minimumReleaseAge: 1440
+allowBuilds:
+    esbuild: true
